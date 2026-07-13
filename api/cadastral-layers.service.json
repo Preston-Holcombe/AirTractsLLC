@@ -1,0 +1,93 @@
+{
+  "currentVersion": 10.81,
+  "serviceDescription": "Parcel Boundaries for Nashville/Davidson County",
+  "mapName": "Layers",
+  "description": "",
+  "copyrightText": "Metro GIS",
+  "supportsDynamicLayers": true,
+  "layers": [
+    {
+      "id": 1,
+      "name": "Dimensions",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPoint",
+      "minScale": 1200,
+      "maxScale": 0
+    },
+    {
+      "id": 3,
+      "name": "Subdivision",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 10000,
+      "maxScale": 0
+    },
+    {
+      "id": 4,
+      "name": "Ownership Parcels",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 10000,
+      "maxScale": 0
+    },
+    {
+      "id": 5,
+      "name": "Lot Polygon",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 4000,
+      "maxScale": 0
+    },
+    {
+      "id": 11,
+      "name": "House Numbers",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 2400,
+      "maxScale": 0
+    }
+  ],
+  "tables": [],
+  "spatialReference": {
+    "wkid": 102100,
+    "latestWkid": 3857
+  },
+  "singleFusedMapCache": false,
+  "initialExtent": {
+    "xmin": -9653646.40870178,
+    "ymin": 4325029.864226675,
+    "xmax": -9653220.957850879,
+    "ymax": 4325146.9425858315,
+    "spatialReference": {
+      "wkid": 102100,
+      "latestWkid": 3857
+    }
+  },
+  "fullExtent": {
+    "xmin": -9691426.178275209,
+    "ymin": 4295768.767364729,
+    "xmax": -9630328.560978306,
+    "ymax": 4356764.270168258,
+    "spatialReference": {
+      "wkid": 102100,
+      "latestWkid": 3857
+    }
+  },
+  "minScale": 10000,
+  "maxScale": 0,
+  "units": "esriMeters",
+  "documentInfo": {
+    "Title": "Parcels",
+    "Author": "jhiggs",
+    "Comments": "Parcel Boundaries for Nashville/Davidson County",
+    "Subject": "Parcel Boundaries for Nashville/Davidson County",
+    "Keywords": "Nashville,Davidson County,Cadastral,Parcels,Lots,Ownership"
+  },
+  "capabilities": "Map,Query,Data",
+  "supportedQueryFormats": "JSON, geoJSON",
+  "supportsDatumTransformation": true,
+  "maxRecordCount": 4000,
+  "maxImageHeight": 4096,
+  "maxImageWidth": 4096,
+  "supportedExtensions": "NetFindNearFeaturesRESTSOE"
+}

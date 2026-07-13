@@ -1,0 +1,118 @@
+{
+ "currentVersion": 10.81,
+ "serviceDescription": "Parcel Boundaries for Nashville/Davidson County \n\n",
+ "mapName": "Layers",
+ "description": "",
+ "copyrightText": "MetroGIS",
+ "supportsDynamicLayers": false,
+ "layers": [
+  {
+   "id": 0,
+   "name": "Ownership Parcels",
+   "parentLayerId": -1,
+   "defaultVisibility": true,
+   "subLayerIds": null,
+   "minScale": 10000,
+   "maxScale": 0,
+   "type": "Feature Layer",
+   "geometryType": "esriGeometryPolygon"
+  }
+ ],
+ "tables": [],
+ "spatialReference": {
+  "wkid": 102100,
+  "latestWkid": 3857
+ },
+ "singleFusedMapCache": true,
+ "tileInfo": {
+  "rows": 256,
+  "cols": 256,
+  "dpi": 96,
+  "format": "PNG",
+  "compressionQuality": 0,
+  "origin": {
+   "x": -2.0037508342787E7,
+   "y": 2.0037508342787E7
+  },
+  "spatialReference": {
+   "wkid": 102100,
+   "latestWkid": 3857
+  },
+  "lods": [
+   {"level": 0, "resolution": 156543.03392800014, "scale": 5.91657527591555E8},
+   {"level": 1, "resolution": 78271.51696399994, "scale": 2.95828763795777E8},
+   {"level": 2, "resolution": 39135.75848200009, "scale": 1.47914381897889E8},
+   {"level": 3, "resolution": 19567.87924099992, "scale": 7.3957190948944E7},
+   {"level": 4, "resolution": 9783.93962049996, "scale": 3.6978595474472E7},
+   {"level": 5, "resolution": 4891.96981024998, "scale": 1.8489297737236E7},
+   {"level": 6, "resolution": 2445.98490512499, "scale": 9244648.868618},
+   {"level": 7, "resolution": 1222.992452562495, "scale": 4622324.434309},
+   {"level": 8, "resolution": 611.4962262813797, "scale": 2311162.217155},
+   {"level": 9, "resolution": 305.74811314055756, "scale": 1155581.108577},
+   {"level": 10, "resolution": 152.87405657041106, "scale": 577790.554289},
+   {"level": 11, "resolution": 76.43702828507324, "scale": 288895.277144},
+   {"level": 12, "resolution": 38.21851414253662, "scale": 144447.638572},
+   {"level": 13, "resolution": 19.10925707126831, "scale": 72223.819286},
+   {"level": 14, "resolution": 9.554628535634155, "scale": 36111.909643},
+   {"level": 15, "resolution": 4.77731426794937, "scale": 18055.954822},
+   {"level": 16, "resolution": 2.388657133974685, "scale": 9027.977411},
+   {"level": 17, "resolution": 1.1943285668550503, "scale": 4513.988705},
+   {"level": 18, "resolution": 0.5971642835598172, "scale": 2256.994353},
+   {"level": 19, "resolution": 0.29858214164761665, "scale": 1128.497176},
+   {"level": 20, "resolution": 0.1492910687071374, "scale": 564.24858}
+  ]
+ },
+ "initialExtent": {
+  "xmin": -9661540.22310058,
+  "ymin": 4313020.245990612,
+  "xmax": -9660831.138349079,
+  "ymax": 4313215.376589205,
+  "spatialReference": {
+   "cs": "pcs",
+   "wkid": 102100
+  }
+ },
+ "fullExtent": {
+  "xmin": -9691404.800941521,
+  "ymin": 4295768.997217748,
+  "xmax": -9630328.560978306,
+  "ymax": 4356764.270168258,
+  "spatialReference": {
+   "cs": "pcs",
+   "wkid": 102100
+  }
+ },
+ "minScale": 5.91657527591555E8,
+ "maxScale": 564.24858,
+ "minLOD": 0,
+ "maxLOD": 20,
+ "units": "esriMeters",
+ "supportedImageFormatTypes": "PNG32,PNG24,PNG,JPG,DIB,TIFF,EMF,PS,PDF,GIF,SVG,SVGZ,BMP",
+ "documentInfo": {
+  "Title": "Parcels",
+  "Author": "jhiggs",
+  "Comments": "Parcel Boundaries for Nashville/Davidson County",
+  "Subject": "Parcel Boundaries for Nashville/Davidson County",
+  "Category": "",
+  "AntialiasingMode": "None",
+  "TextAntialiasingMode": "Force",
+  "Keywords": "Nashville,Davidson County,Tennessee,Parcels"
+ },
+ "capabilities": "Map,Query,Data",
+ "supportedQueryFormats": "JSON, geoJSON",
+ "exportTilesAllowed": false,
+ "referenceScale": 0,
+ "datumTransformations": [
+  {"geoTransforms": [{"wkid": 108001, "latestWkid": 1241, "transformForward": true, "name": "NAD_1927_To_NAD_1983_NADCON"}]},
+  {"geoTransforms": [{"wkid": 108001, "latestWkid": 1241, "transformForward": false, "name": "NAD_1927_To_NAD_1983_NADCON"}]},
+  {"geoTransforms": [{"wkid": 8074, "latestWkid": 1174, "transformForward": true, "name": "NAD_1927_To_WGS_1984_5"}]},
+  {"geoTransforms": [{"wkid": 8074, "latestWkid": 1174, "transformForward": false, "name": "NAD_1927_To_WGS_1984_5"}]},
+  {"geoTransforms": [{"wkid": 8494, "latestWkid": 1515, "transformForward": true, "name": "NAD_1983_To_WGS_1984_5"}]},
+  {"geoTransforms": [{"wkid": 8494, "latestWkid": 1515, "transformForward": false, "name": "NAD_1983_To_WGS_1984_5"}]}
+ ],
+ "supportsDatumTransformation": true,
+ "maxRecordCount": 10000,
+ "maxImageHeight": 4096,
+ "maxImageWidth": 4096,
+ "supportedExtensions": "KmlServer"
+}

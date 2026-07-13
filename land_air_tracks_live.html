@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Land Air Tracks — Davidson County Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --ink:#17251e;         /* survey ink */
+  --paper:#f6f4ec;       /* drafting paper */
+  --panel:#fdfcf7;
+  --line:#cec9b8;        /* parcel hairline */
+  --line-soft:#e4e0d2;
+  --stamp:#c2481e;       /* deed stamp — actions & prices */
+  --stamp-dark:#9c3712;
+  --field:#2e6e4e;       /* positive spread green */
+  --muted:#6f6a5a;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --disp:'Barlow Condensed',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);font-size:13px;color:var(--ink);background:var(--paper);display:flex;flex-direction:column}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:var(--sans);font-size:12.5px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:2px;padding:4px 6px;width:100%}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--stamp);outline-offset:1px}
+input[type=checkbox]{width:auto;accent-color:var(--stamp)}
+
+/* ── header: plat sheet title block ── */
+header{background:var(--ink);color:var(--paper);display:flex;align-items:baseline;gap:14px;padding:8px 16px;border-bottom:3px double var(--stamp)}
+header h1{font-family:var(--disp);font-weight:700;font-size:21px;letter-spacing:.06em;text-transform:uppercase}
+header h1 span{color:var(--stamp)}
+header .sheet{font-family:var(--mono);font-size:10.5px;color:#b9b39e;letter-spacing:.04em}
+nav{margin-left:auto;display:flex;gap:2px}
+nav button{font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:#b9b39e;border:1px solid transparent;border-bottom:none;padding:6px 16px 8px;border-radius:3px 3px 0 0}
+nav button.on{background:var(--paper);color:var(--ink);border-color:var(--stamp)}
+nav button:hover:not(.on){color:var(--paper)}
+
+/* ── layout ── */
+#wrap{flex:1;display:flex;min-height:0}
+aside{width:295px;min-width:295px;background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:12px 14px 24px}
+main{flex:1;display:flex;flex-direction:column;min-width:0}
+#map{flex:1;min-height:220px;background:#e9e7dd}
+#tablewrap{height:34%;min-height:150px;overflow:auto;border-top:2px solid var(--ink);background:#fff;resize:vertical}
+
+/* ── sidebar ── */
+.panel{display:none}
+.panel.on{display:block}
+.panel h2{font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--ink);padding-bottom:4px;margin-bottom:4px}
+.panel .blurb{font-size:11.5px;color:var(--muted);margin-bottom:10px;line-height:1.45}
+fieldset{border:1px solid var(--line);border-radius:2px;padding:8px 9px 9px;margin-bottom:10px;background:#fff}
+legend{font-family:var(--disp);font-size:12.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:0 4px}
+.row{display:flex;gap:8px;margin-bottom:6px;align-items:center}
+.row:last-child{margin-bottom:0}
+.row label{flex:1;font-size:12px}
+.row input[type=number],.row input[type=date],.row select{flex:0 0 92px}
+.row.stack{flex-direction:column;align-items:stretch;gap:3px}
+.hint{font-size:10.5px;color:var(--muted);line-height:1.4}
+.zips{display:grid;grid-template-columns:repeat(4,1fr);gap:2px 6px;font-family:var(--mono);font-size:11px}
+.zips label{display:flex;gap:4px;align-items:center;white-space:nowrap}
+.ziptools{display:flex;gap:6px;margin-top:6px}
+.ziptools button{flex:1;font-size:10.5px;background:none;border:1px solid var(--line);border-radius:2px;padding:2px}
+textarea{font-family:var(--mono);font-size:11px;min-height:74px;resize:vertical}
+
+.runbar{display:flex;gap:8px;margin:4px 0 10px}
+.run{flex:1;font-family:var(--disp);font-size:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--stamp);color:#fff;border:none;border-radius:2px;padding:9px}
+.run:hover{background:var(--stamp-dark)}
+.run:disabled{background:var(--line);color:var(--muted);cursor:default}
+#cancel{display:none;font-family:var(--disp);font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:#fff;color:var(--stamp);border:1px solid var(--stamp);border-radius:2px;padding:0 12px}
+
+/* progress: survey chain */
+#prog{display:none;margin-bottom:10px}
+#prog .lbl{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:3px;min-height:14px}
+#prog .bar{height:10px;border:1px solid var(--ink);background:repeating-linear-gradient(90deg,transparent 0 9px,var(--line-soft) 9px 10px)}
+#prog .fill{height:100%;width:0%;background:repeating-linear-gradient(90deg,var(--stamp) 0 9px,var(--stamp-dark) 9px 10px);transition:width .25s}
+
+#summary{font-family:var(--mono);font-size:11px;line-height:1.7;background:var(--ink);color:var(--paper);border-radius:2px;padding:8px 10px;margin-bottom:10px;display:none;white-space:pre-wrap}
+#summary b{color:#f0b8a2;font-weight:500}
+
+/* ── table ── */
+#tablebar{display:flex;align-items:center;gap:10px;padding:5px 10px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+#tablebar .cnt{font-family:var(--mono);font-size:11px;color:var(--muted)}
+#csv{margin-left:auto;font-family:var(--disp);font-size:13px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;background:#fff;border:1px solid var(--ink);border-radius:2px;padding:3px 12px}
+#csv:hover{background:var(--ink);color:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:11.5px}
+th{font-family:var(--disp);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:left;background:var(--panel);border-bottom:2px solid var(--ink);padding:4px 8px;white-space:nowrap;cursor:pointer;position:sticky;top:31px;z-index:4}
+th .dir{color:var(--stamp)}
+td{border-bottom:1px solid var(--line-soft);padding:3.5px 8px;white-space:nowrap}
+td.num{font-family:var(--mono);font-size:11px;text-align:right}
+td .pos{color:var(--field);font-weight:500}
+tr:hover td{background:#f3f0e4}
+tr.sel td{background:#fbe9e1}
+.empty{padding:26px;text-align:center;color:var(--muted);font-size:12px}
+
+/* ── popup ── */
+.leaflet-popup-content-wrapper{border-radius:2px;border:1px solid var(--ink);font-family:var(--sans)}
+.pp{font-size:11.5px;min-width:215px}
+.pp h3{font-family:var(--disp);font-size:15px;letter-spacing:.04em;margin-bottom:2px}
+.pp .apn{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:6px}
+.pp dl{display:grid;grid-template-columns:auto 1fr;gap:1px 10px}
+.pp dt{color:var(--muted)}
+.pp dd{font-family:var(--mono);font-size:10.5px;text-align:right}
+.pp .zbtn{margin-top:7px;width:100%;font-size:11px;background:#fff;border:1px solid var(--stamp);color:var(--stamp);border-radius:2px;padding:3px}
+.pp .zres{margin-top:5px;font-family:var(--mono);font-size:10.5px;color:var(--field)}
+.pp a{color:var(--stamp)}
+
+footer{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--panel);border-top:1px solid var(--line);padding:3px 16px;display:flex;gap:16px}
+@media (max-width:820px){
+  #wrap{flex-direction:column}
+  aside{width:100%;min-width:0;max-height:45vh;border-right:none;border-bottom:2px solid var(--ink)}
+  header .sheet{display:none}
+}
+@media (prefers-reduced-motion:reduce){#prog .fill{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Land <span>Air</span> Tracks</h1>
+  <div class="sheet">DAVIDSON CO. TN · LIVE CADASTRAL CONSOLE · SHEET 1 OF 1</div>
+  <nav>
+    <button id="tab-leads" class="on">Land Leads</button>
+    <button id="tab-flips">Builder Flips</button>
+    <button id="tab-comps">Land Comps</button>
+  </nav>
+</header>
+<div id="wrap">
+<aside>
+  <div id="prog"><div class="lbl"></div><div class="bar"><div class="fill"></div></div></div>
+  <div id="summary"></div>
+
+  <!-- ─────────── LAND LEADS ─────────── -->
+  <section class="panel on" id="panel-leads">
+    <h2>Land Leads</h2>
+    <p class="blurb">Vacant or demolished lots held long-term by reachable owners. Queries the live Cadastral parcels layer.</p>
+    <div class="runbar"><button class="run" id="run-leads">Run sweep</button><button id="cancel">Stop</button></div>
+    <fieldset><legend>Lot</legend>
+      <div class="row"><label for="ld-acres">Min acres</label><input type="number" id="ld-acres" value="0.20" step="0.05" min="0"></div>
+      <div class="row"><label for="ld-front">Min frontage (ft)</label><input type="number" id="ld-front" value="20" step="5" min="0"></div>
+      <div class="row"><label for="ld-mode">Land-use mode</label>
+        <select id="ld-mode">
+          <option value="both">Vacant or demo'd</option>
+          <option value="vacant">Vacant only (010)</option>
+          <option value="demo">Demo'd only (Impr=0)</option>
+        </select></div>
+    </fieldset>
+    <fieldset><legend>Owner</legend>
+      <div class="row"><label for="ld-years">Held more than (yrs)</label><input type="number" id="ld-years" value="5" step="1" min="0"></div>
+      <div class="row"><label for="ld-excl">Exclude gov / church / HOA / bank</label><input type="checkbox" id="ld-excl" checked style="flex:0 0 auto"></div>
+      <div class="hint">LLC / trust / holdings owners stay in — they're leads, not noise.</div>
+    </fieldset>
+    <fieldset><legend>District</legend>
+      <div class="row"><label><input type="checkbox" id="ld-usd" checked> USD</label><label><input type="checkbox" id="ld-gsd" checked> GSD</label></div>
+    </fieldset>
+    <fieldset><legend>ZIP codes</legend>
+      <div class="zips" id="ld-zips"></div>
+      <div class="ziptools"><button id="ld-zall">All</button><button id="ld-znone">None</button><button id="ld-zcore">Urban core</button></div>
+    </fieldset>
+    <fieldset><legend>Live viewport</legend>
+      <div class="row"><label for="ld-live">Refresh as I pan the map</label><input type="checkbox" id="ld-live" style="flex:0 0 auto"></div>
+      <div class="hint">Applies the filters above to whatever's in view (zoom 15+). Ignores ZIP checkboxes.</div>
+    </fieldset>
+  </section>
+
+  <!-- ─────────── BUILDER FLIPS ─────────── -->
+  <section class="panel" id="panel-flips">
+    <h2>Builder Flips</h2>
+    <p class="blurb">What builders paid for dirt vs. what the finished product sold for. Four-step pipeline against deed history.</p>
+    <div class="runbar"><button class="run" id="run-flips">Find flips</button></div>
+    <fieldset><legend>Builders (one per line)</legend>
+      <div class="row stack"><textarea id="fl-builders"></textarea>
+      <div class="hint">Buyer-name keywords, matched case-insensitively.</div></div>
+    </fieldset>
+    <fieldset><legend>Window &amp; band</legend>
+      <div class="row"><label for="fl-years">Look back (yrs)</label><input type="number" id="fl-years" value="7" min="1"></div>
+      <div class="row"><label for="fl-minland">Land price ≥</label><input type="number" id="fl-minland" value="10000" step="5000"></div>
+      <div class="row"><label for="fl-maxland">Land price ≤</label><input type="number" id="fl-maxland" value="400000" step="10000"></div>
+    </fieldset>
+    <fieldset><legend>Resale test</legend>
+      <div class="row"><label for="fl-minresale">Resale ≥</label><input type="number" id="fl-minresale" value="150000" step="10000"></div>
+      <div class="row"><label for="fl-minspread">Spread ≥</label><input type="number" id="fl-minspread" value="50000" step="5000"></div>
+      <div class="row"><label for="fl-mindays">Build days ≥</label><input type="number" id="fl-mindays" value="60"></div>
+      <div class="row"><label for="fl-maxdays">Build days ≤</label><input type="number" id="fl-maxdays" value="1095"></div>
+      <div class="row"><label for="fl-cap">Max buys / builder</label><input type="number" id="fl-cap" value="100"></div>
+    </fieldset>
+  </section>
+
+  <!-- ─────────── LAND COMPS ─────────── -->
+  <section class="panel" id="panel-comps">
+    <h2>Land Comps</h2>
+    <p class="blurb">Every market sale of a lot that was <b>unimproved when it traded</b> — including lots since built on — with sold-and-resold chains flagged.</p>
+    <div class="runbar"><button class="run" id="run-comps">Run comps</button></div>
+    <fieldset><legend>Windows</legend>
+      <div class="row"><label for="cp-years">Sales window (yrs)</label><input type="number" id="cp-years" value="5" min="1"></div>
+      <div class="row"><label for="cp-lead">Assessment lead-in (mo)</label><input type="number" id="cp-lead" value="18" min="0"></div>
+      <div class="hint">Assessments are pulled this many months before the sales window so early sales still classify.</div>
+    </fieldset>
+    <fieldset><legend>Sale filters</legend>
+      <div class="row"><label for="cp-floor">Price &gt;</label><input type="number" id="cp-floor" value="1000" step="500"></div>
+      <div class="row"><label for="cp-ceil">Price ≤ (0 = none)</label><input type="number" id="cp-ceil" value="0" step="10000"></div>
+      <div class="row"><label for="cp-trustee">Include trustee (foreclosure) deeds</label><input type="checkbox" id="cp-trustee" style="flex:0 0 auto"></div>
+    </fieldset>
+    <fieldset><legend>Vacancy test</legend>
+      <div class="row"><label for="cp-tol">Improvement value ≤ $</label><input type="number" id="cp-tol" value="0" step="1000"></div>
+      <div class="hint">Latest assessment on or before the sale date must have improvement value at or under this. Raise to ~5000 to tolerate sheds.</div>
+    </fieldset>
+    <fieldset><legend>Results</legend>
+      <div class="row"><label for="cp-chains">Resold-parcel chains only</label><input type="checkbox" id="cp-chains" style="flex:0 0 auto"></div>
+      <div class="hint">Show only parcels that traded 2+ times in the window — the wholesaling picture.</div>
+    </fieldset>
+  </section>
+</aside>
+<main>
+  <div id="map"></div>
+  <div id="tablewrap">
+    <div id="tablebar"><span class="cnt" id="cnt">No results yet</span><button id="csv">Export CSV</button></div>
+    <div id="tbl"><div class="empty">Set your filters and run. Results land here and on the map.</div></div>
+  </div>
+</main>
+</div>
+<footer><span>SOURCES: maps.nashville.gov /arcgis + /arcgis2 (live)</span><span>NO BACKEND · NO SCHEDULED JOBS</span><span id="ft-status"></span></footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ══════════════ Land Air Tracks — live console ══════════════
+   All queries hit Metro Nashville's public ArcGIS endpoints from
+   the browser. Schema reference: api/NASHVILLE_PARCELS_API.md   */
+'use strict';
+
+/* ── endpoints ── */
+const EP = {
+  cad:    'https://maps.nashville.gov/arcgis/rest/services/Cadastral/Parcels/MapServer/0/query',
+  deeds:  'https://maps.nashville.gov/arcgis2/rest/services/Parcels/ParcelHistory/MapServer/2/query',
+  assess: 'https://maps.nashville.gov/arcgis2/rest/services/Parcels/ParcelHistory/MapServer/6/query',
+  zoning: 'https://maps.nashville.gov/arcgis/rest/services/Zoning_Landuse/Zoning/MapServer/14/query',
+  flood:  'https://maps.nashville.gov/arcgis/rest/services/Zoning_Landuse/Zoning/MapServer/19/query'
+};
+const HIST_PAGE = 100;   /* arcgis2 hard cap */
+const CAD_PAGE  = 1000;
+
+const DAVIDSON_ZIPS = ["37013","37027","37072","37076","37080","37115","37138","37189",
+ "37201","37203","37204","37205","37206","37207","37208","37209","37210","37211","37212",
+ "37213","37214","37215","37216","37217","37218","37219","37220","37221","37228"];
+const CORE_ZIPS = ["37203","37204","37206","37207","37208","37209","37210","37211","37212","37216","37218"];
+
+const OWNER_EXCLUSIONS = ["METRO GOV","AIRPORT","STATE OF","CITY OF","AUTHORITY","HOMEOWNERS",
+ "HOA","OWNERS ASSOC","ASSOCIATION","O.I.C","CHURCH","MINISTRIES","MINISTRY","TEMPLE",
+ "BAPTIST","METHODIST","SCHOOL","BANK"];
+
+const DEFAULT_BUILDERS = ["MERITAGE","RYAN HOMES","NVR","BEAZER","DREES","LEGACY SOUTH",
+ "BUILDING MASTERS","JCL CONSTRUCTION","LENNAR","CRAIGHEAD","GOODALL","COBALT VENTURES",
+ "BUILD TRUST","PAROS GROUP","JACKSON BUILDERS","AVENUE CONSTRUCTION","FINEMAN","PARAGON GROUP",
+ "CENTURY COMMUNITIES","SIGNATURE HOMES","FRANK BATSON","REGENT HOMES","NEAL CONSTRUCTION",
+ "ERMAC DRIVE","NORTHERN HORIZONS","CLEAR CREEK","COLE WOODWORKS","UNIQUE MANAGEMENT",
+ "EPG CONSTRUCTION","PREMIER CONSTRUCTION"];
+
+/* ── tiny utils ── */
+const $ = id => document.getElementById(id);
+const num = id => parseFloat($(id).value) || 0;
+const fmt$ = v => v==null ? '' : '$' + Math.round(v).toLocaleString();
+const fmtN = (v,d=2) => v==null ? '' : v.toLocaleString(undefined,{maximumFractionDigits:d});
+const msToISO = ms => ms==null ? '' : new Date(ms).toISOString().slice(0,10);
+const isoNYearsAgo = y => { const d=new Date(); d.setFullYear(d.getFullYear()-y); return d.toISOString().slice(0,10); };
+const isoNMonthsBefore = (iso,m) => { const d=new Date(iso); d.setMonth(d.getMonth()-m); return d.toISOString().slice(0,10); };
+const chunk = (a,n) => { const o=[]; for(let i=0;i<a.length;i+=n) o.push(a.slice(i,i+n)); return o; };
+const sqlEsc = s => String(s).replace(/'/g,"''");
+const escHtml = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ── run state / progress ── */
+let ctl = null, running = false;
+function startRun(btn){
+  if (running) return null;
+  running = true; ctl = new AbortController();
+  document.querySelectorAll('.run').forEach(b=>b.disabled=true);
+  $('cancel').style.display='block';
+  $('summary').style.display='none';
+  setProg(0,1,'Starting…'); $('prog').style.display='block';
+  return ctl.signal;
+}
+function endRun(){
+  running=false; ctl=null;
+  document.querySelectorAll('.run').forEach(b=>b.disabled=false);
+  $('cancel').style.display='none'; $('prog').style.display='none';
+}
+$('cancel') && ($('cancel').onclick = ()=> ctl && ctl.abort());
+function setProg(done,total,label){
+  $('prog').querySelector('.fill').style.width = total ? Math.min(100,100*done/total)+'%' : '0%';
+  if (label!=null) $('prog').querySelector('.lbl').textContent = label;
+}
+function showSummary(txt){ const s=$('summary'); s.innerHTML=txt; s.style.display='block'; }
+function fail(e){
+  endRun();
+  if (e && e.name==='AbortError'){ $('ft-status').textContent='Stopped.'; return; }
+  console.error(e);
+  showSummary('<b>Query failed.</b>\n'+escHtml(e.message||e)+'\nThe county server may be busy — try again, or narrow the window.');
+}
+
+/* ── ArcGIS plumbing ── */
+async function aq(url, params, signal){
+  const p = new URLSearchParams(params); p.set('f','json');
+  const r = await fetch(url+'?'+p.toString(), {signal});
+  if (!r.ok) throw new Error('HTTP '+r.status+' from '+url.split('/services/')[1].split('/query')[0]);
+  const j = await r.json();
+  if (j.error) throw new Error('ArcGIS: '+(j.error.message||JSON.stringify(j.error.details||j.error)));
+  return j;
+}
+/* drain one WHERE via resultOffset paging */
+async function pageAll(url, params, pageSize, signal, onPage){
+  const out=[]; let offset=0;
+  while(true){
+    const j = await aq(url, {...params, resultOffset:offset, resultRecordCount:pageSize}, signal);
+    const feats = j.features||[];
+    out.push(...feats);
+    if (onPage) onPage(out.length, feats.length);
+    if (feats.length < pageSize && !j.exceededTransferLimit) break;
+    if (!feats.length) break;
+    offset += feats.length;
+  }
+  return out;
+}
+/* small worker pool over batches */
+async function pool(items, size, signal, worker, onDone){
+  const out=[]; let i=0, done=0;
+  async function lane(){
+    while(i<items.length){
+      if (signal && signal.aborted) throw new DOMException('aborted','AbortError');
+      const mine = items[i++];
+      const r = await worker(mine);
+      out.push(r); done++;
+      if (onDone) onDone(done, items.length);
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(size,items.length)}, lane));
+  return out;
+}
+
+/* ── map ── */
+const map = L.map('map',{zoomControl:true}).setView([36.166,-86.78],11);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  {attribution:'&copy; OpenStreetMap &copy; CARTO', maxZoom:20}).addTo(map);
+const resultLayer = L.layerGroup().addTo(map);
+const POLY_LIMIT = 1600;  /* above this, dots instead of lot lines */
+
+function ringsToLatLngs(geom){
+  if (!geom || !geom.rings) return null;
+  return geom.rings.map(r => r.map(pt => [pt[1], pt[0]]));   /* outSR=4326 → [lng,lat] */
+}
+function centroidOf(latlngs){
+  const r = latlngs && latlngs[0]; if (!r || !r.length) return null;
+  let la=0,ln=0; r.forEach(p=>{la+=p[0];ln+=p[1];});
+  return [la/r.length, ln/r.length];
+}
+function drawResults(rows, popupFn, colorFn){
+  resultLayer.clearLayers();
+  const usePoly = rows.length <= POLY_LIMIT;
+  const bounds = [];
+  rows.forEach(row=>{
+    const ll = row._latlngs, c = row._center;
+    if (!ll && !c) return;
+    const color = colorFn ? colorFn(row) : '#c2481e';
+    let lyr;
+    if (usePoly && ll){
+      lyr = L.polygon(ll,{color, weight:1.6, fillColor:color, fillOpacity:.14});
+    } else if (c){
+      lyr = L.circleMarker(c,{radius:5,color,weight:1.4,fillColor:color,fillOpacity:.5});
+    } else return;
+    lyr.bindPopup(()=>popupFn(row), {maxWidth:290});
+    lyr.on('popupopen', ()=>wireZoning(row, lyr));
+    resultLayer.addLayer(lyr);
+    row._layer = lyr;
+    if (c) bounds.push(c);
+  });
+  if (bounds.length && !$('ld-live').checked) map.fitBounds(bounds,{padding:[24,24],maxZoom:16});
+}
+
+/* lazy zoning + flood on popup click (point-in-polygon, layer 14 / 19) */
+function wireZoning(row, lyr){
+  const el = lyr.getPopup().getElement(); if (!el) return;
+  const btn = el.querySelector('.zbtn'); if (!btn) return;
+  btn.onclick = async ()=>{
+    btn.disabled = true; btn.textContent = 'Checking…';
+    try{
+      const g = JSON.stringify({x:row._center[1], y:row._center[0]});
+      const base = {geometry:g, geometryType:'esriGeometryPoint', inSR:4326,
+        spatialRel:'esriSpatialRelIntersects', returnGeometry:'false'};
+      const [z,f] = await Promise.all([
+        aq(EP.zoning, {...base, outFields:'ZONE_DESC,ZONE_TYPE,NAME'}),
+        aq(EP.flood,  {...base, outFields:'FloodZone,SFHA_TF'})
+      ]);
+      const za = (z.features[0]||{}).attributes||{};
+      const fa = (f.features[0]||{}).attributes||{};
+      const flood = fa.FloodZone ? `${fa.FloodZone}${fa.SFHA_TF==='T'||fa.SFHA_TF==='Y'?' — SFHA!':''}` : 'none mapped';
+      row._zoning = za.ZONE_DESC||'—';
+      const res = el.querySelector('.zres');
+      res.textContent = `Zoning ${za.ZONE_DESC||'—'}${za.ZONE_TYPE?' ('+za.ZONE_TYPE+')':''} · Flood: ${flood}`;
+      btn.remove();
+    }catch(e){ btn.disabled=false; btn.textContent='Zoning + flood check'; console.error(e); }
+  };
+}
+
+/* ── results table ── */
+let tblCols=[], tblRows=[], sortKey=null, sortDir=1;
+function setResults(cols, rows, label){
+  tblCols=cols; tblRows=rows; sortKey=null;
+  $('cnt').textContent = rows.length ? `${rows.length.toLocaleString()} ${label}` : 'No matches';
+  renderTable();
+}
+function renderTable(){
+  if (!tblRows.length){ $('tbl').innerHTML='<div class="empty">Nothing matched. Loosen a filter and run again.</div>'; return; }
+  const rows = [...tblRows];
+  if (sortKey!=null){
+    rows.sort((a,b)=>{ const x=a[sortKey], y=b[sortKey];
+      if (x==null) return 1; if (y==null) return -1;
+      return (typeof x==='number' ? x-y : String(x).localeCompare(String(y))) * sortDir; });
+  }
+  let h='<table><thead><tr>';
+  tblCols.forEach(c=>{ h+=`<th data-k="${c.k}">${c.t}${sortKey===c.k?`<span class="dir"> ${sortDir>0?'▲':'▼'}</span>`:''}</th>`; });
+  h+='</tr></thead><tbody>';
+  rows.slice(0,3000).forEach((r,i)=>{
+    h+=`<tr data-i="${tblRows.indexOf(r)}">`;
+    tblCols.forEach(c=>{
+      let v = r[c.k];
+      if (c.f==='$') v = fmt$(v);
+      else if (c.f==='n') v = fmtN(v, c.d??2);
+      else if (c.f==='d') v = v||'';
+      h+=`<td class="${c.f==='$'||c.f==='n'?'num':''}">${c.pos&&r[c.k]>0?`<span class="pos">${escHtml(v)}</span>`:escHtml(v)}</td>`;
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  if (tblRows.length>3000) h+=`<div class="empty">Showing first 3,000 of ${tblRows.length.toLocaleString()} — export the CSV for everything.</div>`;
+  $('tbl').innerHTML=h;
+  $('tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k; sortDir = sortKey===k ? -sortDir : 1; sortKey=k; renderTable();
+  });
+  $('tbl').querySelectorAll('tbody tr').forEach(tr=>tr.onclick=()=>{
+    const row = tblRows[+tr.dataset.i];
+    if (row && row._layer){ map.setView(row._center,17); row._layer.openPopup(); }
+    $('tbl').querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel')); tr.classList.add('sel');
+  });
+}
+$('csv').onclick = ()=>{
+  if (!tblRows.length) return;
+  const esc = v => { v = v==null?'':String(v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  const lines = [tblCols.map(c=>esc(c.t)).join(',')];
+  tblRows.forEach(r=>lines.push(tblCols.map(c=>esc(r[c.k])).join(',')));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
+  a.download = `land_air_tracks_${activeTab}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+};
+
+/* ══════════════ TAB 1 · LAND LEADS ══════════════ */
+(function buildZipGrid(){
+  const g = $('ld-zips');
+  DAVIDSON_ZIPS.forEach(z=>{
+    const l=document.createElement('label');
+    l.innerHTML=`<input type="checkbox" value="${z}" checked> ${z}`;
+    g.appendChild(l);
+  });
+  const set = fn => g.querySelectorAll('input').forEach(cb=>cb.checked=fn(cb.value));
+  $('ld-zall').onclick = ()=>set(()=>true);
+  $('ld-znone').onclick = ()=>set(()=>false);
+  $('ld-zcore').onclick = ()=>set(z=>CORE_ZIPS.includes(z));
+})();
+
+function leadsWhereCore(){
+  const parts=[];
+  const mode = $('ld-mode').value;
+  if (mode==='vacant') parts.push("LUCode='010'");
+  else if (mode==='demo') parts.push("ImprAppr=0");
+  else parts.push("(LUCode='010' OR ImprAppr=0)");
+  const dists=[]; if ($('ld-usd').checked) dists.push("'USD'"); if ($('ld-gsd').checked) dists.push("'GSD'");
+  if (dists.length===1) parts.push(`TaxDist=${dists[0]}`);
+  else if (dists.length===2) parts.push("TaxDist IN ('USD','GSD')");
+  if (num('ld-acres')>0) parts.push(`Acres >= ${num('ld-acres')}`);
+  if (num('ld-front')>0) parts.push(`Front >= ${num('ld-front')}`);
+  if ($('ld-excl').checked) OWNER_EXCLUSIONS.forEach(t=>parts.push(`Owner NOT LIKE '%${sqlEsc(t)}%'`));
+  if (num('ld-years')>0) parts.push(`OwnDate < '${isoNYearsAgo(num('ld-years'))}'`);  /* plain string — DATE'' 404s here */
+  return parts;
+}
+const LEAD_FIELDS = 'APN,ParID,PropAddr,PropZip,Owner,OwnAddr1,OwnCity,OwnState,LUCode,LUDesc,Acres,Front,Side,LandAppr,ImprAppr,TotlAppr,OwnDate,TaxDist';
+const LEAD_COLS = [
+  {k:'PropAddr',t:'Address'},{k:'PropZip',t:'ZIP'},{k:'Acres',t:'Acres',f:'n'},
+  {k:'Front',t:'Front',f:'n',d:0},{k:'LUDesc',t:'Land use'},{k:'Owner',t:'Owner'},
+  {k:'ownerLoc',t:'Owner loc'},{k:'yearsHeld',t:'Yrs held',f:'n',d:1},
+  {k:'LandAppr',t:'Land appr',f:'$'},{k:'TotlAppr',t:'Total appr',f:'$'},{k:'APN',t:'APN'}
+];
+function shapeLead(f, zip){
+  const a=f.attributes;
+  a.OwnDate = msToISO(a.OwnDate);
+  a.yearsHeld = a.OwnDate ? +( (Date.now()-new Date(a.OwnDate))/3.15576e10 ).toFixed(1) : null;
+  a.ownerLoc = [a.OwnCity,a.OwnState].filter(Boolean).join(' ');
+  if (zip && !a.PropZip) a.PropZip = zip;
+  a._latlngs = ringsToLatLngs(f.geometry);
+  a._center = centroidOf(a._latlngs);
+  return a;
+}
+const leadPopup = r => `<div class="pp"><h3>${escHtml(r.PropAddr||'(no address)')}</h3>
+  <div class="apn">APN ${escHtml(r.APN)} · ParID ${r.ParID}</div><dl>
+  <dt>Owner</dt><dd>${escHtml(r.Owner)}</dd>
+  <dt>Owner loc</dt><dd>${escHtml(r.ownerLoc||'—')}</dd>
+  <dt>Held since</dt><dd>${r.OwnDate} (${r.yearsHeld} yrs)</dd>
+  <dt>Acres / front</dt><dd>${fmtN(r.Acres)} / ${fmtN(r.Front,0)}′</dd>
+  <dt>Use</dt><dd>${escHtml(r.LUDesc)}</dd>
+  <dt>Land / total appr</dt><dd>${fmt$(r.LandAppr)} / ${fmt$(r.TotlAppr)}</dd></dl>
+  <button class="zbtn">Zoning + flood check</button><div class="zres"></div></div>`;
+
+$('run-leads').onclick = async ()=>{
+  const signal = startRun(); if (!signal) return;
+  try{
+    const zips = [...document.querySelectorAll('#ld-zips input:checked')].map(cb=>cb.value);
+    if (!zips.length) throw new Error('Pick at least one ZIP (or use live viewport mode).');
+    const core = leadsWhereCore(); const rows=[]; let zi=0;
+    for (const z of zips){
+      zi++;
+      setProg(zi-1, zips.length, `ZIP ${z} — ${zi}/${zips.length} · ${rows.length.toLocaleString()} lots so far`);
+      const feats = await pageAll(EP.cad,
+        {where:[`PropZip='${z}'`,...core].join(' AND '), outFields:LEAD_FIELDS,
+         returnGeometry:'true', outSR:4326, orderByFields:'OBJECTID ASC'},
+        CAD_PAGE, signal);
+      feats.forEach(f=>rows.push(shapeLead(f,z)));
+    }
+    finishLeads(rows, `${zips.length} ZIPs swept`);
+  }catch(e){ fail(e); }
+};
+
+function finishLeads(rows, how){
+  setResults(LEAD_COLS, rows, 'lots');
+  drawResults(rows, leadPopup);
+  const absentee = rows.filter(r=>r.OwnState && r.OwnState.trim() && r.OwnState.trim()!=='TN').length;
+  const medAcres = median(rows.map(r=>r.Acres).filter(v=>v>0));
+  showSummary(`<b>${rows.length.toLocaleString()}</b> lead lots · ${how}\nmedian <b>${fmtN(medAcres)}</b> ac · <b>${absentee.toLocaleString()}</b> out-of-state owners`);
+  endRun();
+}
+
+/* live viewport mode (Option B): debounce + in-flight cancellation */
+let vpTimer=null, vpCtl=null;
+$('ld-live').onchange = ()=>{ if ($('ld-live').checked) viewportQuery(); };
+map.on('moveend', ()=>{
+  if (!$('ld-live').checked || running) return;
+  clearTimeout(vpTimer); vpTimer=setTimeout(viewportQuery, 400);
+});
+async function viewportQuery(){
+  if (map.getZoom() < 15){ $('ft-status').textContent='Live mode: zoom to 15+ to query.'; return; }
+  if (vpCtl) vpCtl.abort();
+  vpCtl = new AbortController();
+  $('ft-status').textContent='Live query…';
+  try{
+    const b = map.getBounds();
+    const j = await aq(EP.cad, {
+      where: leadsWhereCore().join(' AND ') || '1=1',
+      geometry: JSON.stringify({xmin:b.getWest(),ymin:b.getSouth(),xmax:b.getEast(),ymax:b.getNorth()}),
+      geometryType:'esriGeometryEnvelope', inSR:4326, spatialRel:'esriSpatialRelIntersects',
+      outFields:LEAD_FIELDS, returnGeometry:'true', outSR:4326, resultRecordCount:CAD_PAGE
+    }, vpCtl.signal);
+    const rows = (j.features||[]).map(f=>shapeLead(f));
+    setResults(LEAD_COLS, rows, 'lots in view');
+    drawResults(rows, leadPopup);
+    $('ft-status').textContent = `Live: ${rows.length} lots in view${j.exceededTransferLimit?' (capped — zoom in)':''}`;
+  }catch(e){ if (e.name!=='AbortError'){ console.error(e); $('ft-status').textContent='Live query failed.'; } }
+}
+
+function median(a){ if(!a.length) return null; const s=[...a].sort((x,y)=>x-y); const m=s.length>>1; return s.length%2?s[m]:(s[m-1]+s[m])/2; }
+
+/* ══════════════ TAB 2 · BUILDER FLIPS ══════════════ */
+$('fl-builders').value = DEFAULT_BUILDERS.join('\n');
+const FLIP_COLS = [
+  {k:'PropAddr',t:'Address'},{k:'PropZip',t:'ZIP'},{k:'builder',t:'Builder bought'},
+  {k:'landPrice',t:'Paid for land',f:'$'},{k:'landDate',t:'Bought'},
+  {k:'resalePrice',t:'Sold for',f:'$'},{k:'resaleDate',t:'Sold'},
+  {k:'spread',t:'Spread',f:'$',pos:true},{k:'buildDays',t:'Days',f:'n',d:0},
+  {k:'resaleBuyer',t:'End buyer'},{k:'Acres',t:'Acres',f:'n'},{k:'APN',t:'APN'}
+];
+$('run-flips').onclick = async ()=>{
+  const signal = startRun(); if (!signal) return;
+  try{
+    const kws = $('fl-builders').value.split('\n').map(s=>s.trim().toUpperCase()).filter(Boolean);
+    if (!kws.length) throw new Error('Add at least one builder keyword.');
+    const start = isoNYearsAgo(num('fl-years'));
+    const minL=num('fl-minland'), maxL=num('fl-maxland');
+
+    /* step 1 — builder land buys */
+    setProg(0,4,'1/4 · Pulling builder land purchases…');
+    const likes = kws.map(k=>`UPPER(name) LIKE '%${sqlEsc(k)}%'`).join(' OR ');
+    const where1 = `(${likes}) AND sortdate >= '${start}' AND SalePrice >= ${minL} AND SalePrice <= ${maxL} AND InstrumentType = 'Deed'`;
+    let purchases = (await pageAll(EP.deeds,
+      {where:where1, outFields:'parcelid,name,SalePrice,sortdate,OwnDoc,url', orderByFields:'sortdate DESC'},
+      HIST_PAGE, signal, n=>setProg(0.2,4,`1/4 · ${n.toLocaleString()} purchases pulled…`)
+    )).map(f=>f.attributes);
+
+    /* per-builder cap (keeps national builders from drowning the small shops) */
+    const cap = num('fl-cap')||100, perB={};
+    const bucket = nm => { const u=(nm||'').toUpperCase(); return kws.find(k=>u.includes(k))||'?'; };
+    purchases = purchases.filter(p=>{ const b=bucket(p.name); perB[b]=(perB[b]||0)+1; return perB[b]<=cap; });
+    if (!purchases.length) throw new Error('No land purchases matched. Loosen the price band or add keywords.');
+
+    /* step 2 — full deed chains for those parcels */
+    const ids = [...new Set(purchases.map(p=>p.parcelid).filter(v=>v!=null))];
+    const batches = chunk(ids, 40);
+    setProg(1,4,`2/4 · Deed chains for ${ids.length.toLocaleString()} parcels…`);
+    const histFeats = await pool(batches, 5, signal, b =>
+      pageAll(EP.deeds, {where:`parcelid IN (${b.join(',')}) AND InstrumentType = 'Deed'`,
+        outFields:'parcelid,name,SalePrice,sortdate', orderByFields:'sortdate ASC'}, HIST_PAGE, signal),
+      (d,t)=>setProg(1+d/t,4,`2/4 · Deed chains — batch ${d}/${t}`));
+    const byParcel = {};
+    histFeats.flat().forEach(f=>{ (byParcel[f.attributes.parcelid] ||= []).push(f.attributes); });
+
+    /* step 3 — match buy → later resale */
+    setProg(3,4,'3/4 · Matching resales…');
+    const minR=num('fl-minresale'), minS=num('fl-minspread'), minD=num('fl-mindays'), maxD=num('fl-maxdays');
+    const flips=[];
+    purchases.forEach(p=>{
+      const hist = (byParcel[p.parcelid]||[]).sort((a,b)=>a.sortdate-b.sortdate);
+      const later = hist.filter(h => h.sortdate > p.sortdate && h.SalePrice >= minR);
+      for (const r of later){
+        const days = Math.round((r.sortdate - p.sortdate)/8.64e7);
+        const spread = r.SalePrice - p.SalePrice;
+        const sameBuilder = bucket(r.name) === bucket(p.name) && bucket(r.name)!=='?';
+        if (days>=minD && days<=maxD && spread>=minS && !sameBuilder){
+          flips.push({parcelid:p.parcelid, builder:p.name, landPrice:p.SalePrice, landDate:msToISO(p.sortdate),
+            resalePrice:r.SalePrice, resaleDate:msToISO(r.sortdate), resaleBuyer:r.name,
+            spread, buildDays:days, deedUrl:p.url});
+          break;
+        }
+      }
+    });
+    if (!flips.length) throw new Error('Purchases found, but none met the resale/spread/day tests.');
+
+    /* step 4 — parcel details + geometry */
+    setProg(3.4,4,'4/4 · Parcel details…');
+    const fIds = [...new Set(flips.map(f=>f.parcelid))];
+    const cadFeats = await pool(chunk(fIds,200), 4, signal, b =>
+      aq(EP.cad, {where:`ParID IN (${b.join(',')})`, outFields:'ParID,APN,PropAddr,PropZip,Acres,LUDesc,Owner',
+        returnGeometry:'true', outSR:4326}, signal).then(j=>j.features||[]),
+      (d,t)=>setProg(3.4+0.6*d/t,4,`4/4 · Parcel details — batch ${d}/${t}`));
+    const cadBy = {};
+    cadFeats.flat().forEach(f=>{ cadBy[f.attributes.ParID] = f; });
+    flips.forEach(fl=>{
+      const cf = cadBy[fl.parcelid];
+      if (cf){ Object.assign(fl, cf.attributes); fl._latlngs = ringsToLatLngs(cf.geometry); fl._center = centroidOf(fl._latlngs); }
+    });
+
+    setResults(FLIP_COLS, flips, 'flips');
+    drawResults(flips, r => `<div class="pp"><h3>${escHtml(r.PropAddr||'(no address)')}</h3>
+      <div class="apn">APN ${escHtml(r.APN||'')} · ${escHtml(r.builder)}</div><dl>
+      <dt>Land buy</dt><dd>${fmt$(r.landPrice)} · ${r.landDate}</dd>
+      <dt>Resale</dt><dd>${fmt$(r.resalePrice)} · ${r.resaleDate}</dd>
+      <dt>Spread</dt><dd>${fmt$(r.spread)} in ${r.buildDays}d</dd>
+      <dt>End buyer</dt><dd>${escHtml(r.resaleBuyer)}</dd></dl>
+      ${r.deedUrl?`<a href="${escHtml(r.deedUrl)}" target="_blank" rel="noopener">Deed record ↗</a>`:''}
+      <button class="zbtn">Zoning + flood check</button><div class="zres"></div></div>`,
+      r => r.spread>150000 ? '#2e6e4e' : '#c2481e');
+    const medLand = median(flips.map(f=>f.landPrice)), medSp = median(flips.map(f=>f.spread));
+    showSummary(`<b>${flips.length}</b> confirmed flips\nmedian land <b>${fmt$(medLand)}</b> · median spread <b>${fmt$(medSp)}</b>\nmedian land price = your wholesale ceiling`);
+    endRun();
+  }catch(e){ fail(e); }
+};
+
+/* ══════════════ TAB 3 · LAND COMPS ══════════════
+   Postman-validated recipe (api/NASHVILLE_PARCELS_API.md):
+   1. assessments where IMP_APPR_VAL=0  → candidate parcels
+   2. market deeds for candidates       → sales
+   3. full assessment history for sold  → vacant-at-sale classification
+   4. cadastral join                    → address / acres / LU / geometry
+   Chains: seller of hop N = buyer of hop N-1.                      */
+const COMP_COLS = [
+  {k:'PropAddr',t:'Address'},{k:'PropZip',t:'ZIP'},{k:'Acres',t:'Acres',f:'n'},
+  {k:'salePrice',t:'Sale',f:'$'},{k:'perAcre',t:'$/acre',f:'$'},{k:'saleDate',t:'Date'},
+  {k:'buyer',t:'Buyer'},{k:'seller',t:'Seller'},{k:'hop',t:'Hop',f:'n',d:0},
+  {k:'holdDays',t:'Held (d)',f:'n',d:0},{k:'hopSpread',t:'Hop spread',f:'$',pos:true},
+  {k:'LUDesc',t:'Use now'},{k:'landAssd',t:'Land appr @ sale',f:'$'},{k:'APN',t:'APN'}
+];
+$('run-comps').onclick = async ()=>{
+  const signal = startRun(); if (!signal) return;
+  try{
+    const salesStart = isoNYearsAgo(num('cp-years'));
+    const assessStart = isoNMonthsBefore(salesStart, num('cp-lead'));
+    const floor=num('cp-floor'), ceil=num('cp-ceil'), tol=num('cp-tol');
+    const instr = $('cp-trustee').checked ? "InstrumentType IN ('Deed','Trustees Deed')" : "InstrumentType = 'Deed'";
+
+    /* step 1 — candidate parcels: any zero-improvement assessment in window */
+    setProg(0,4,'1/4 · Finding zero-improvement assessments…');
+    const zeroRows = (await pageAll(EP.assess,
+      {where:`IMP_APPR_VAL = 0 AND sortdate >= '${assessStart}'`, outFields:'parcelid',
+       orderByFields:'parcelid ASC'}, HIST_PAGE, signal,
+      n=>setProg(Math.min(.95, n/40000),4,`1/4 · ${n.toLocaleString()} assessment rows…`)
+    )).map(f=>f.attributes.parcelid);
+    const candidates = [...new Set(zeroRows.filter(v=>v!=null))];
+    if (!candidates.length) throw new Error('No zero-improvement assessments found in that window.');
+
+    /* step 2 — market deeds for candidates */
+    let where2 = `sortdate >= '${salesStart}' AND SalePrice > ${floor} AND ${instr}`;
+    if (ceil>0) where2 += ` AND SalePrice <= ${ceil}`;
+    const dBatches = chunk(candidates, 40);
+    setProg(1,4,`2/4 · Deeds for ${candidates.length.toLocaleString()} candidate parcels…`);
+    const deedFeats = await pool(dBatches, 5, signal, b =>
+      pageAll(EP.deeds, {where:`parcelid IN (${b.join(',')}) AND ${where2}`,
+        outFields:'parcelid,name,SalePrice,sortdate,InstrumentType,OwnDoc,url',
+        orderByFields:'sortdate ASC'}, HIST_PAGE, signal),
+      (d,t)=>setProg(1+d/t,4,`2/4 · Deed batches ${d}/${t}`));
+    const salesBy = {};
+    deedFeats.flat().forEach(f=>{ (salesBy[f.attributes.parcelid] ||= []).push(f.attributes); });
+    const soldIds = Object.keys(salesBy).map(Number);
+    if (!soldIds.length) throw new Error('Candidates found, but none sold in the window with those filters.');
+
+    /* step 3 — full assessment history for sold parcels → classify each sale */
+    const aBatches = chunk(soldIds, 20);
+    setProg(2,4,`3/4 · Assessment history for ${soldIds.length.toLocaleString()} sold parcels…`);
+    const assessFeats = await pool(aBatches, 5, signal, b =>
+      pageAll(EP.assess, {where:`parcelid IN (${b.join(',')})`,
+        outFields:'parcelid,sortdate,IMP_APPR_VAL,LAND_APPR_VAL', orderByFields:'sortdate ASC'},
+        HIST_PAGE, signal),
+      (d,t)=>setProg(2+d/t,4,`3/4 · Assessment batches ${d}/${t}`));
+    const assessBy = {};
+    assessFeats.flat().forEach(f=>{ (assessBy[f.attributes.parcelid] ||= []).push(f.attributes); });
+
+    let comps=[], skippedBuilt=0, skippedUnknown=0;
+    soldIds.forEach(pid=>{
+      const sales = salesBy[pid].sort((a,b)=>a.sortdate-b.sortdate);
+      const hist  = (assessBy[pid]||[]).sort((a,b)=>a.sortdate-b.sortdate);
+      sales.forEach((s,i)=>{
+        const before = hist.filter(h=>h.sortdate<=s.sortdate);
+        const at = before[before.length-1];
+        if (!at){ skippedUnknown++; return; }
+        if (at.IMP_APPR_VAL > tol){ skippedBuilt++; return; }
+        const prev = i>0 ? sales[i-1] : null;
+        comps.push({parcelid:pid, buyer:s.name, salePrice:s.SalePrice, saleDate:msToISO(s.sortdate),
+          _saleMs:s.sortdate, instr:s.InstrumentType, deedUrl:s.url,
+          seller: prev ? prev.name : '', hop:i+1, tradesInWindow:sales.length,
+          holdDays: prev ? Math.round((s.sortdate-prev.sortdate)/8.64e7) : null,
+          hopSpread: prev ? s.SalePrice - prev.SalePrice : null,
+          landAssd: at.LAND_APPR_VAL});
+      });
+    });
+    if ($('cp-chains').checked) comps = comps.filter(c=>c.tradesInWindow>=2);
+    if (!comps.length) throw new Error(`No vacant-at-sale comps survived (skipped ${skippedBuilt} improved-at-sale, ${skippedUnknown} unclassifiable).`);
+
+    /* step 4 — cadastral join */
+    const cIds = [...new Set(comps.map(c=>c.parcelid))];
+    setProg(3,4,`4/4 · Cadastral join for ${cIds.length.toLocaleString()} parcels…`);
+    const cadFeats = await pool(chunk(cIds,200), 4, signal, b =>
+      aq(EP.cad, {where:`ParID IN (${b.join(',')})`,
+        outFields:'ParID,APN,PropAddr,PropZip,Acres,DeededAcreage,LUCode,LUDesc,Owner',
+        returnGeometry:'true', outSR:4326}, signal).then(j=>j.features||[]),
+      (d,t)=>setProg(3+d/t,4,`4/4 · Cadastral batches ${d}/${t}`));
+    const cadBy={};
+    cadFeats.flat().forEach(f=>{ cadBy[f.attributes.ParID]=f; });
+    comps.forEach(c=>{
+      const cf = cadBy[c.parcelid];
+      if (cf){ Object.assign(c, cf.attributes);
+        c._latlngs = ringsToLatLngs(cf.geometry); c._center = centroidOf(c._latlngs); }
+      c.perAcre = (c.Acres>0) ? Math.round(c.salePrice/c.Acres) : null;
+    });
+
+    setResults(COMP_COLS, comps, 'vacant-land sales');
+    drawResults(comps, r => `<div class="pp"><h3>${escHtml(r.PropAddr||'(no address)')}</h3>
+      <div class="apn">APN ${escHtml(r.APN||'')} · hop ${r.hop} of ${r.tradesInWindow}</div><dl>
+      <dt>Sale</dt><dd>${fmt$(r.salePrice)} · ${r.saleDate}</dd>
+      <dt>$/acre</dt><dd>${fmt$(r.perAcre)} (${fmtN(r.Acres)} ac)</dd>
+      <dt>Buyer</dt><dd>${escHtml(r.buyer)}</dd>
+      <dt>Seller</dt><dd>${escHtml(r.seller||'— (pre-window)')}</dd>
+      ${r.holdDays!=null?`<dt>Prev hold</dt><dd>${r.holdDays}d · ${r.hopSpread>=0?'+':''}${fmt$(r.hopSpread)}</dd>`:''}
+      <dt>Land appr @ sale</dt><dd>${fmt$(r.landAssd)}</dd>
+      <dt>Use now</dt><dd>${escHtml(r.LUDesc||'—')}</dd></dl>
+      ${r.deedUrl?`<a href="${escHtml(r.deedUrl)}" target="_blank" rel="noopener">Deed record ↗</a>`:''}
+      <button class="zbtn">Zoning + flood check</button><div class="zres"></div></div>`,
+      r => r.tradesInWindow>=2 ? '#2e6e4e' : '#c2481e');
+
+    /* summary: county medians + top ZIPs by $/acre */
+    const withAcre = comps.filter(c=>c.perAcre);
+    const zipAgg={};
+    withAcre.forEach(c=>{ (zipAgg[c.PropZip] ||= []).push(c.perAcre); });
+    const zipLines = Object.entries(zipAgg).filter(([,v])=>v.length>=5)
+      .map(([z,v])=>({z, n:v.length, med:median(v)}))
+      .sort((a,b)=>b.med-a.med).slice(0,6)
+      .map(o=>`  ${o.z}  <b>${fmt$(o.med)}</b>/ac  (${o.n})`).join('\n');
+    const resold = new Set(comps.filter(c=>c.tradesInWindow>=2).map(c=>c.parcelid)).size;
+    showSummary(`<b>${comps.length.toLocaleString()}</b> vacant-at-sale comps · <b>${resold}</b> parcels resold in window\n`+
+      `median <b>${fmt$(median(comps.map(c=>c.salePrice)))}</b> · median <b>${fmt$(median(withAcre.map(c=>c.perAcre)))}</b>/ac\n`+
+      `skipped: ${skippedBuilt.toLocaleString()} improved-at-sale · ${skippedUnknown.toLocaleString()} no assessment before sale\n`+
+      (zipLines?`top ZIPs by $/ac (n≥5):\n${zipLines}`:''));
+    endRun();
+  }catch(e){ fail(e); }
+};
+
+/* ══════════════ tabs ══════════════ */
+let activeTab='leads';
+['leads','flips','comps'].forEach(t=>{
+  $('tab-'+t).onclick = ()=>{
+    activeTab=t;
+    ['leads','flips','comps'].forEach(x=>{
+      $('tab-'+x).classList.toggle('on', x===t);
+      $('panel-'+x).classList.toggle('on', x===t);
+    });
+  };
+});
+</script>
+</body>
+</html>

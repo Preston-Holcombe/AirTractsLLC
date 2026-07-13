@@ -1,0 +1,1157 @@
+{
+  "layers": [
+    {
+      "id": 0,
+      "name": "Property (NO DATA)",
+      "type": "Feature Layer",
+      "description": "PROPLIS",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "STANPAR",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 10000,
+      "maxScale": 0,
+      "defaultVisibility": true,
+      "extent": {
+        "xmin": 1656737.5167918056,
+        "ymin": 595512.3999146372,
+        "xmax": 1817373.7991931438,
+        "ymax": 755221.4000498056,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "STANPAR",
+          "type": "esriFieldTypeString",
+          "alias": "STANPAR",
+          "length": 14
+        },
+        {
+          "name": "FEATURETYPE",
+          "type": "esriFieldTypeString",
+          "alias": "FEATURETYPE",
+          "length": 15
+        },
+        {
+          "name": "PARCELTYPE",
+          "type": "esriFieldTypeInteger",
+          "alias": "PARCELTYPE"
+        },
+        {
+          "name": "DEEDEDACREAGE",
+          "type": "esriFieldTypeDouble",
+          "alias": "DEEDEDACREAGE"
+        },
+        {
+          "name": "IN_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "IN_DATE",
+          "length": 8
+        },
+        {
+          "name": "FLOORNUMBER",
+          "type": "esriFieldTypeString",
+          "alias": "FLOORNUMBER",
+          "length": 5
+        },
+        {
+          "name": "USER_ID",
+          "type": "esriFieldTypeString",
+          "alias": "USER_ID",
+          "length": 20
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "ParID",
+          "type": "esriFieldTypeInteger",
+          "alias": "ParID"
+        },
+        {
+          "name": "APN",
+          "type": "esriFieldTypeString",
+          "alias": "APN",
+          "length": 25
+        },
+        {
+          "name": "DateEst",
+          "type": "esriFieldTypeDate",
+          "alias": "DateEst",
+          "length": 8
+        },
+        {
+          "name": "IsActive",
+          "type": "esriFieldTypeString",
+          "alias": "IsActive",
+          "length": 1
+        },
+        {
+          "name": "DateInact",
+          "type": "esriFieldTypeDate",
+          "alias": "DateInact",
+          "length": 8
+        },
+        {
+          "name": "Tract",
+          "type": "esriFieldTypeString",
+          "alias": "Tract",
+          "length": 20
+        },
+        {
+          "name": "Council",
+          "type": "esriFieldTypeString",
+          "alias": "Council",
+          "length": 2
+        },
+        {
+          "name": "TaxDist",
+          "type": "esriFieldTypeString",
+          "alias": "TaxDist",
+          "length": 10
+        },
+        {
+          "name": "ParType",
+          "type": "esriFieldTypeString",
+          "alias": "ParType",
+          "length": 4
+        },
+        {
+          "name": "Owner",
+          "type": "esriFieldTypeString",
+          "alias": "Owner",
+          "length": 200
+        },
+        {
+          "name": "OwnDate",
+          "type": "esriFieldTypeDate",
+          "alias": "OwnDate",
+          "length": 8
+        },
+        {
+          "name": "SalePrice",
+          "type": "esriFieldTypeDouble",
+          "alias": "SalePrice"
+        },
+        {
+          "name": "SaleCode",
+          "type": "esriFieldTypeString",
+          "alias": "SaleCode",
+          "length": 4
+        },
+        {
+          "name": "SaleSrc",
+          "type": "esriFieldTypeString",
+          "alias": "SaleSrc",
+          "length": 4
+        },
+        {
+          "name": "ValidSale",
+          "type": "esriFieldTypeString",
+          "alias": "ValidSale",
+          "length": 1
+        },
+        {
+          "name": "OwnInstr",
+          "type": "esriFieldTypeString",
+          "alias": "OwnInstr",
+          "length": 55
+        },
+        {
+          "name": "OwnAddr1",
+          "type": "esriFieldTypeString",
+          "alias": "OwnAddr1",
+          "length": 100
+        },
+        {
+          "name": "OwnAddr2",
+          "type": "esriFieldTypeString",
+          "alias": "OwnAddr2",
+          "length": 100
+        },
+        {
+          "name": "OwnAddr3",
+          "type": "esriFieldTypeString",
+          "alias": "OwnAddr3",
+          "length": 100
+        },
+        {
+          "name": "OwnCity",
+          "type": "esriFieldTypeString",
+          "alias": "OwnCity",
+          "length": 100
+        },
+        {
+          "name": "OwnState",
+          "type": "esriFieldTypeString",
+          "alias": "OwnState",
+          "length": 4
+        },
+        {
+          "name": "OwnCountry",
+          "type": "esriFieldTypeString",
+          "alias": "OwnCountry",
+          "length": 10
+        },
+        {
+          "name": "OwnZip",
+          "type": "esriFieldTypeString",
+          "alias": "OwnZip",
+          "length": 20
+        },
+        {
+          "name": "PropAddr",
+          "type": "esriFieldTypeString",
+          "alias": "PropAddr",
+          "length": 150
+        },
+        {
+          "name": "PropHouse",
+          "type": "esriFieldTypeString",
+          "alias": "PropHouse",
+          "length": 15
+        },
+        {
+          "name": "PropStreet",
+          "type": "esriFieldTypeString",
+          "alias": "PropStreet",
+          "length": 95
+        },
+        {
+          "name": "PropSuite",
+          "type": "esriFieldTypeString",
+          "alias": "PropSuite",
+          "length": 20
+        },
+        {
+          "name": "PropCity",
+          "type": "esriFieldTypeString",
+          "alias": "PropCity",
+          "length": 100
+        },
+        {
+          "name": "PropState",
+          "type": "esriFieldTypeString",
+          "alias": "PropState",
+          "length": 4
+        },
+        {
+          "name": "PropZip",
+          "type": "esriFieldTypeString",
+          "alias": "PropZip",
+          "length": 5
+        },
+        {
+          "name": "LegalDesc",
+          "type": "esriFieldTypeString",
+          "alias": "LegalDesc",
+          "length": 250
+        },
+        {
+          "name": "PropInstr",
+          "type": "esriFieldTypeString",
+          "alias": "PropInstr",
+          "length": 55
+        },
+        {
+          "name": "PropDate",
+          "type": "esriFieldTypeDate",
+          "alias": "PropDate",
+          "length": 8
+        },
+        {
+          "name": "Acres",
+          "type": "esriFieldTypeDouble",
+          "alias": "Acres"
+        },
+        {
+          "name": "Front",
+          "type": "esriFieldTypeInteger",
+          "alias": "Front"
+        },
+        {
+          "name": "Side",
+          "type": "esriFieldTypeInteger",
+          "alias": "Side"
+        },
+        {
+          "name": "IsRegular",
+          "type": "esriFieldTypeString",
+          "alias": "IsRegular",
+          "length": 1
+        },
+        {
+          "name": "LUCode",
+          "type": "esriFieldTypeString",
+          "alias": "LUCode",
+          "length": 4
+        },
+        {
+          "name": "LUDesc",
+          "type": "esriFieldTypeString",
+          "alias": "LUDesc",
+          "length": 50
+        },
+        {
+          "name": "FinishArea",
+          "type": "esriFieldTypeDouble",
+          "alias": "FinishArea"
+        },
+        {
+          "name": "FirstFloor",
+          "type": "esriFieldTypeDouble",
+          "alias": "FirstFloor"
+        },
+        {
+          "name": "DUCount",
+          "type": "esriFieldTypeInteger",
+          "alias": "DUCount"
+        },
+        {
+          "name": "AssessZone",
+          "type": "esriFieldTypeString",
+          "alias": "AssessZone",
+          "length": 2
+        },
+        {
+          "name": "NHID",
+          "type": "esriFieldTypeInteger",
+          "alias": "NHID"
+        },
+        {
+          "name": "LandAppr",
+          "type": "esriFieldTypeDouble",
+          "alias": "LandAppr"
+        },
+        {
+          "name": "ImprAppr",
+          "type": "esriFieldTypeDouble",
+          "alias": "ImprAppr"
+        },
+        {
+          "name": "TotlAppr",
+          "type": "esriFieldTypeDouble",
+          "alias": "TotlAppr"
+        },
+        {
+          "name": "LandAssd",
+          "type": "esriFieldTypeDouble",
+          "alias": "LandAssd"
+        },
+        {
+          "name": "ImprAssd",
+          "type": "esriFieldTypeDouble",
+          "alias": "ImprAssd"
+        },
+        {
+          "name": "TotlAssd",
+          "type": "esriFieldTypeDouble",
+          "alias": "TotlAssd"
+        },
+        {
+          "name": "AssessDate",
+          "type": "esriFieldTypeDate",
+          "alias": "AssessDate",
+          "length": 8
+        },
+        {
+          "name": "PropFraction",
+          "type": "esriFieldTypeString",
+          "alias": "PropFraction",
+          "length": 10
+        },
+        {
+          "name": "GovType",
+          "type": "esriFieldTypeString",
+          "alias": "GovType",
+          "length": 50
+        },
+        {
+          "name": "IsExempt",
+          "type": "esriFieldTypeString",
+          "alias": "IsExempt",
+          "length": 1
+        },
+        {
+          "name": "EqualizedCode",
+          "type": "esriFieldTypeString",
+          "alias": "EqualizedCode",
+          "length": 1
+        },
+        {
+          "name": "starea",
+          "type": "esriFieldTypeDouble",
+          "alias": "starea"
+        }
+      ],
+      "maxRecordCount": 100,
+      "supportedQueryFormats": "JSON, geoJSON, PBF",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "supportedOperations": [
+        "Query",
+        "GenerateRenderer",
+        "ReturnUpdates"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "id": 2,
+      "name": "Ownership History",
+      "type": "Table",
+      "description": "Ownership History 2",
+      "displayField": "name",
+      "defaultVisibility": false,
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeNone",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "ownerid",
+          "type": "esriFieldTypeOID",
+          "alias": "ownerid"
+        },
+        {
+          "name": "parcelid",
+          "type": "esriFieldTypeInteger",
+          "alias": "parcelid"
+        },
+        {
+          "name": "name",
+          "type": "esriFieldTypeString",
+          "alias": "name",
+          "length": 200
+        },
+        {
+          "name": "address1",
+          "type": "esriFieldTypeString",
+          "alias": "address1",
+          "length": 100
+        },
+        {
+          "name": "address2",
+          "type": "esriFieldTypeString",
+          "alias": "address2",
+          "length": 100
+        },
+        {
+          "name": "city",
+          "type": "esriFieldTypeString",
+          "alias": "city",
+          "length": 100
+        },
+        {
+          "name": "StateCode",
+          "type": "esriFieldTypeString",
+          "alias": "StateCode",
+          "length": 50
+        },
+        {
+          "name": "PostalCode",
+          "type": "esriFieldTypeString",
+          "alias": "PostalCode",
+          "length": 20
+        },
+        {
+          "name": "CountryCode",
+          "type": "esriFieldTypeString",
+          "alias": "CountryCode",
+          "length": 4
+        },
+        {
+          "name": "DateAcquired",
+          "type": "esriFieldTypeString",
+          "alias": "DateAcquired",
+          "length": 4000
+        },
+        {
+          "name": "OwnDoc",
+          "type": "esriFieldTypeString",
+          "alias": "OwnDoc",
+          "length": 55
+        },
+        {
+          "name": "SalePrice",
+          "type": "esriFieldTypeDouble",
+          "alias": "SalePrice"
+        },
+        {
+          "name": "Status",
+          "type": "esriFieldTypeString",
+          "alias": "Status",
+          "length": 8
+        },
+        {
+          "name": "Instrument",
+          "type": "esriFieldTypeString",
+          "alias": "Instrument",
+          "length": 55
+        },
+        {
+          "name": "InstrumentType",
+          "type": "esriFieldTypeString",
+          "alias": "InstrumentType",
+          "length": 50
+        },
+        {
+          "name": "url",
+          "type": "esriFieldTypeString",
+          "alias": "url",
+          "length": 4000
+        },
+        {
+          "name": "sortdate",
+          "type": "esriFieldTypeDate",
+          "alias": "sortdate",
+          "length": 8
+        }
+      ],
+      "maxRecordCount": 100,
+      "supportedQueryFormats": "JSON, PBF",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": false,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "supportedOperations": [
+        "Query",
+        "QueryAttachments",
+        "GenerateRenderer",
+        "ReturnUpdates"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Property History",
+      "type": "Table",
+      "description": "Property History",
+      "displayField": "parcelid",
+      "defaultVisibility": false,
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeNone",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "PID",
+          "type": "esriFieldTypeOID",
+          "alias": "PID"
+        },
+        {
+          "name": "parcelid",
+          "type": "esriFieldTypeInteger",
+          "alias": "parcelid"
+        },
+        {
+          "name": "apn",
+          "type": "esriFieldTypeString",
+          "alias": "apn",
+          "length": 25
+        },
+        {
+          "name": "Status",
+          "type": "esriFieldTypeString",
+          "alias": "Status",
+          "length": 8
+        },
+        {
+          "name": "DateInactive",
+          "type": "esriFieldTypeString",
+          "alias": "DateInactive",
+          "length": 4000
+        },
+        {
+          "name": "LegalDescription",
+          "type": "esriFieldTypeString",
+          "alias": "LegalDescription",
+          "length": 250
+        },
+        {
+          "name": "Instrument",
+          "type": "esriFieldTypeString",
+          "alias": "Instrument",
+          "length": 55
+        },
+        {
+          "name": "InstrumentType",
+          "type": "esriFieldTypeString",
+          "alias": "InstrumentType",
+          "length": 50
+        },
+        {
+          "name": "FullAddress",
+          "type": "esriFieldTypeString",
+          "alias": "FullAddress",
+          "length": 150
+        },
+        {
+          "name": "City",
+          "type": "esriFieldTypeString",
+          "alias": "City",
+          "length": 100
+        },
+        {
+          "name": "Zip",
+          "type": "esriFieldTypeString",
+          "alias": "Zip",
+          "length": 5
+        },
+        {
+          "name": "Acres",
+          "type": "esriFieldTypeDouble",
+          "alias": "Acres"
+        },
+        {
+          "name": "front",
+          "type": "esriFieldTypeDouble",
+          "alias": "front"
+        },
+        {
+          "name": "Side",
+          "type": "esriFieldTypeDouble",
+          "alias": "Side"
+        },
+        {
+          "name": "IsRegular",
+          "type": "esriFieldTypeString",
+          "alias": "IsRegular",
+          "length": 1
+        },
+        {
+          "name": "DateEffective",
+          "type": "esriFieldTypeString",
+          "alias": "DateEffective",
+          "length": 4000
+        },
+        {
+          "name": "propertyid",
+          "type": "esriFieldTypeInteger",
+          "alias": "propertyid"
+        },
+        {
+          "name": "url",
+          "type": "esriFieldTypeString",
+          "alias": "url",
+          "length": 4000
+        },
+        {
+          "name": "sortdate",
+          "type": "esriFieldTypeDate",
+          "alias": "sortdate",
+          "length": 8
+        }
+      ],
+      "maxRecordCount": 100,
+      "supportedQueryFormats": "JSON, PBF",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": false,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "supportedOperations": [
+        "Query",
+        "QueryAttachments",
+        "GenerateRenderer",
+        "ReturnUpdates"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Permit History",
+      "type": "Table",
+      "description": "Building Permit History",
+      "displayField": "CASE_NAME",
+      "defaultVisibility": false,
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeNone",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "CA_OBJECT_ID",
+          "type": "esriFieldTypeDouble",
+          "alias": "CA_OBJECT_ID"
+        },
+        {
+          "name": "PID",
+          "type": "esriFieldTypeOID",
+          "alias": "PID"
+        },
+        {
+          "name": "CASE_TYPE",
+          "type": "esriFieldTypeString",
+          "alias": "CASE_TYPE",
+          "length": 10
+        },
+        {
+          "name": "CASE_TYPE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "CASE_TYPE_DESC",
+          "length": 40
+        },
+        {
+          "name": "SUB_TYPE",
+          "type": "esriFieldTypeString",
+          "alias": "SUB_TYPE",
+          "length": 10
+        },
+        {
+          "name": "SUB_TYPE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "SUB_TYPE_DESC",
+          "length": 40
+        },
+        {
+          "name": "CASE_NUMBER",
+          "type": "esriFieldTypeString",
+          "alias": "CASE_NUMBER",
+          "length": 20
+        },
+        {
+          "name": "CASE_NAME",
+          "type": "esriFieldTypeString",
+          "alias": "CASE_NAME",
+          "length": 80
+        },
+        {
+          "name": "STATUS_CODE",
+          "type": "esriFieldTypeString",
+          "alias": "STATUS_CODE",
+          "length": 10
+        },
+        {
+          "name": "DATE_ACCEPTED",
+          "type": "esriFieldTypeDate",
+          "alias": "DATE_ACCEPTED",
+          "length": 8
+        },
+        {
+          "name": "CONSTVAL",
+          "type": "esriFieldTypeDouble",
+          "alias": "CONSTVAL"
+        },
+        {
+          "name": "DATE_ISSUED",
+          "type": "esriFieldTypeDate",
+          "alias": "DATE_ISSUED",
+          "length": 8
+        },
+        {
+          "name": "LOCATION",
+          "type": "esriFieldTypeString",
+          "alias": "LOCATION",
+          "length": 100
+        },
+        {
+          "name": "CX",
+          "type": "esriFieldTypeDouble",
+          "alias": "CX"
+        },
+        {
+          "name": "CY",
+          "type": "esriFieldTypeDouble",
+          "alias": "CY"
+        },
+        {
+          "name": "APN",
+          "type": "esriFieldTypeString",
+          "alias": "APN",
+          "length": 20
+        },
+        {
+          "name": "ADDRESS",
+          "type": "esriFieldTypeString",
+          "alias": "ADDRESS",
+          "length": 1000
+        },
+        {
+          "name": "SCOPE",
+          "type": "esriFieldTypeString",
+          "alias": "SCOPE",
+          "length": 4000
+        },
+        {
+          "name": "CONTACT",
+          "type": "esriFieldTypeString",
+          "alias": "CONTACT",
+          "length": 60
+        },
+        {
+          "name": "BLDG_SQ_FT",
+          "type": "esriFieldTypeDouble",
+          "alias": "BLDG_SQ_FT"
+        },
+        {
+          "name": "FINALDATE",
+          "type": "esriFieldTypeDate",
+          "alias": "FINALDATE",
+          "length": 8
+        },
+        {
+          "name": "FINALCODE",
+          "type": "esriFieldTypeString",
+          "alias": "FINALCODE",
+          "length": 20
+        },
+        {
+          "name": "UNITS",
+          "type": "esriFieldTypeInteger",
+          "alias": "UNITS"
+        },
+        {
+          "name": "epermits",
+          "type": "esriFieldTypeString",
+          "alias": "epermits",
+          "length": 90
+        }
+      ],
+      "maxRecordCount": 100,
+      "supportedQueryFormats": "JSON, PBF",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": false,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "supportedOperations": [
+        "Query",
+        "QueryAttachments",
+        "GenerateRenderer",
+        "ReturnUpdates"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Zoning History",
+      "type": "Table",
+      "description": "Zoning History",
+      "displayField": "ParcelID",
+      "defaultVisibility": false,
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeNone",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "ZID",
+          "type": "esriFieldTypeOID",
+          "alias": "ZID"
+        },
+        {
+          "name": "ParcelID",
+          "type": "esriFieldTypeInteger",
+          "alias": "ParcelID"
+        },
+        {
+          "name": "ZoneCode",
+          "type": "esriFieldTypeString",
+          "alias": "ZoneCode",
+          "length": 10
+        },
+        {
+          "name": "Description",
+          "type": "esriFieldTypeString",
+          "alias": "Description",
+          "length": 1073741822
+        },
+        {
+          "name": "OrdinanceNumber",
+          "type": "esriFieldTypeString",
+          "alias": "OrdinanceNumber",
+          "length": 20
+        },
+        {
+          "name": "DateEffective",
+          "type": "esriFieldTypeString",
+          "alias": "DateEffective",
+          "length": 4000
+        },
+        {
+          "name": "CaseNumber",
+          "type": "esriFieldTypeString",
+          "alias": "CaseNumber",
+          "length": 25
+        },
+        {
+          "name": "Status",
+          "type": "esriFieldTypeString",
+          "alias": "Status",
+          "length": 8
+        },
+        {
+          "name": "url",
+          "type": "esriFieldTypeString",
+          "alias": "url",
+          "length": 95
+        },
+        {
+          "name": "sortdate",
+          "type": "esriFieldTypeDate",
+          "alias": "sortdate",
+          "length": 8
+        }
+      ],
+      "maxRecordCount": 100,
+      "supportedQueryFormats": "JSON, PBF",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": false,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "supportedOperations": [
+        "Query",
+        "QueryAttachments",
+        "GenerateRenderer",
+        "ReturnUpdates"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Assessment History",
+      "type": "Table",
+      "description": "Assessment History 2",
+      "displayField": "Name",
+      "defaultVisibility": false,
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeNone",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "AID",
+          "type": "esriFieldTypeInteger",
+          "alias": "AID"
+        },
+        {
+          "name": "parcelid",
+          "type": "esriFieldTypeInteger",
+          "alias": "parcelid"
+        },
+        {
+          "name": "DateEffective",
+          "type": "esriFieldTypeString",
+          "alias": "DateEffective",
+          "length": 4000
+        },
+        {
+          "name": "AssessorCode",
+          "type": "esriFieldTypeString",
+          "alias": "AssessorCode",
+          "length": 2
+        },
+        {
+          "name": "Status",
+          "type": "esriFieldTypeString",
+          "alias": "Status",
+          "length": 8
+        },
+        {
+          "name": "EqualizedCode",
+          "type": "esriFieldTypeString",
+          "alias": "EqualizedCode",
+          "length": 1
+        },
+        {
+          "name": "IMP_APPR_VAL",
+          "type": "esriFieldTypeDouble",
+          "alias": "IMP_APPR_VAL"
+        },
+        {
+          "name": "LAND_APPR_VAL",
+          "type": "esriFieldTypeDouble",
+          "alias": "LAND_APPR_VAL"
+        },
+        {
+          "name": "TOTL_APPR_VAL",
+          "type": "esriFieldTypeDouble",
+          "alias": "TOTL_APPR_VAL"
+        },
+        {
+          "name": "LAND_ASSESS_VAL",
+          "type": "esriFieldTypeDouble",
+          "alias": "LAND_ASSESS_VAL"
+        },
+        {
+          "name": "IMP_ASSESS_VAL",
+          "type": "esriFieldTypeDouble",
+          "alias": "IMP_ASSESS_VAL"
+        },
+        {
+          "name": "TOTL_ASSESS_VAL",
+          "type": "esriFieldTypeDouble",
+          "alias": "TOTL_ASSESS_VAL"
+        },
+        {
+          "name": "CLASS",
+          "type": "esriFieldTypeString",
+          "alias": "CLASS",
+          "length": 4
+        },
+        {
+          "name": "Name",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 50
+        },
+        {
+          "name": "PER",
+          "type": "esriFieldTypeDouble",
+          "alias": "PER"
+        },
+        {
+          "name": "sortdate",
+          "type": "esriFieldTypeDate",
+          "alias": "sortdate",
+          "length": 8
+        },
+        {
+          "name": "ESRI_OID",
+          "type": "esriFieldTypeOID",
+          "alias": "ESRI_OID"
+        }
+      ],
+      "maxRecordCount": 100,
+      "supportedQueryFormats": "JSON, PBF",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": false,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "supportedOperations": [
+        "Query",
+        "QueryAttachments",
+        "GenerateRenderer",
+        "ReturnUpdates"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Assessor Account Numbers",
+      "type": "Table",
+      "description": null,
+      "displayField": "USER_ACCOUNT",
+      "defaultVisibility": false,
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeNone",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "USER_ACCOUNT",
+          "type": "esriFieldTypeString",
+          "alias": "USER_ACCOUNT",
+          "length": 30
+        },
+        {
+          "name": "ACCOUNTNUMBER",
+          "type": "esriFieldTypeInteger",
+          "alias": "ACCOUNTNUMBER"
+        }
+      ],
+      "maxRecordCount": 100,
+      "supportedQueryFormats": "JSON, PBF",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": false,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "supportedOperations": [
+        "Query",
+        "QueryAttachments",
+        "GenerateRenderer",
+        "ReturnUpdates"
+      ]
+    }
+  ]
+}

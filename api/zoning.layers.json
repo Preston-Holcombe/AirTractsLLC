@@ -1,0 +1,2455 @@
+{
+  "layers": [
+    {
+      "id": 0,
+      "name": "Adult Entertainment Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 1,
+      "name": "Historic Bed and Breakfast Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "NAME",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 255
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 2,
+      "name": "Contextual Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 3,
+      "name": "Historic Landmark Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "NAME",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 255
+        },
+        {
+          "name": "IMPACT_AREA",
+          "type": "esriFieldTypeString",
+          "alias": "IMPACT_AREA",
+          "length": 1
+        },
+        {
+          "name": "IMPACT_SUBAREA",
+          "type": "esriFieldTypeString",
+          "alias": "IMPACT_SUBAREA",
+          "length": 1
+        },
+        {
+          "name": "IMPACT_ZONE",
+          "type": "esriFieldTypeString",
+          "alias": "IMPACT_ZONE",
+          "length": 3
+        },
+        {
+          "name": "SUBDISTRICT",
+          "type": "esriFieldTypeString",
+          "alias": "SUBDISTRICT",
+          "length": 2
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 4,
+      "name": "Historic Preservation Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "NAME",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 255
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 5,
+      "name": "I-440 Impact Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "IMPACT_ZONE",
+          "type": "esriFieldTypeString",
+          "alias": "Impact Zone",
+          "length": 3
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 6,
+      "name": "Instiutional Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "NAME",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 255
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 7,
+      "name": "Historic Neighborhood Conservation Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "NAME",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 255
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 8,
+      "name": "Neighborhood Landmark Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "NAME",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 255
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 9,
+      "name": "Planned Unit Development",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 100000,
+      "maxScale": 0,
+      "defaultVisibility": true,
+      "extent": {
+        "xmin": 1649210.5352083296,
+        "ymin": 601202.8333333284,
+        "xmax": 1800527.1666666716,
+        "ymax": 743786.4166666716,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 25
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 20
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 10,
+      "name": "Urban Design Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "NAME",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 255
+        },
+        {
+          "name": "SUBDISTRICT",
+          "type": "esriFieldTypeString",
+          "alias": "Subdistrict",
+          "length": 2
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 12,
+      "name": "Airport Impact Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 13,
+      "name": "Urban Zoning Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 14,
+      "name": "Zoning",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": true,
+      "extent": {
+        "xmin": 1656681.9166666716,
+        "ymin": 595512.4166666716,
+        "xmax": 1816269.6666666716,
+        "ymax": 755221.6666666716,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 25
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 20,
+          "domain": {
+            "type": "codedValue",
+            "note": "115 coded values \u2014 the base zoning codes (AG, AR2A, CA, ... incl. RS/R residential, CS/CL commercial, IWD/IR industrial, SP)"
+          }
+        },
+        {
+          "name": "ZONE_TYPE",
+          "type": "esriFieldTypeString",
+          "alias": "SP Type",
+          "length": 10,
+          "domain": {
+            "type": "codedValue",
+            "note": "12 coded values (A, C, IND, ...) \u2014 what a Specific Plan district functions as"
+          }
+        },
+        {
+          "name": "NAME",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 255
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 15,
+      "name": "Residential Accessory Structure Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "NAME",
+          "type": "esriFieldTypeString",
+          "alias": "Name",
+          "length": 255
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 16,
+      "name": "Corridor Design Overlay District",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 19,
+      "name": "Floodplain Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "DFIRM_ID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656664.942133844,
+        "ymin": 595562.7137904167,
+        "xmax": 1816136.8567851782,
+        "ymax": 755249.8606228381,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "DFIRM_ID",
+          "type": "esriFieldTypeString",
+          "alias": "DFIRM_ID",
+          "length": 6
+        },
+        {
+          "name": "Version_ID",
+          "type": "esriFieldTypeString",
+          "alias": "Version_ID",
+          "length": 11
+        },
+        {
+          "name": "FloodAreaID",
+          "type": "esriFieldTypeString",
+          "alias": "FloodAreaID",
+          "length": 32
+        },
+        {
+          "name": "StudyType",
+          "type": "esriFieldTypeString",
+          "alias": "StudyType",
+          "length": 28
+        },
+        {
+          "name": "FloodZone",
+          "type": "esriFieldTypeString",
+          "alias": "FloodZone",
+          "length": 17
+        },
+        {
+          "name": "ZoneSubtype",
+          "type": "esriFieldTypeString",
+          "alias": "ZoneSubtype",
+          "length": 72
+        },
+        {
+          "name": "SFHA_TF",
+          "type": "esriFieldTypeString",
+          "alias": "SFHA_TF",
+          "length": 1
+        },
+        {
+          "name": "SourceCitation",
+          "type": "esriFieldTypeString",
+          "alias": "SourceCitation",
+          "length": 21
+        },
+        {
+          "name": "ZoneDescription",
+          "type": "esriFieldTypeString",
+          "alias": "ZoneDescription",
+          "length": 50
+        },
+        {
+          "name": "Shape",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "AdoptedDate",
+          "type": "esriFieldTypeDate",
+          "alias": "AdoptedDate",
+          "length": 8
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "Shape.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "Shape.STArea()"
+        },
+        {
+          "name": "Shape.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    },
+    {
+      "id": 21,
+      "name": "Detatched Accessory Dwelling Unit Overlay",
+      "type": "Feature Layer",
+      "description": "",
+      "geometryType": "esriGeometryPolygon",
+      "sourceSpatialReference": {
+        "wkid": 102736,
+        "latestWkid": 2274
+      },
+      "displayField": "OBJECTID",
+      "hasZ": false,
+      "hasM": false,
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false,
+      "extent": {
+        "xmin": 1656513.400000006,
+        "ymin": 596456.5,
+        "xmax": 1818505,
+        "ymax": 755251.400000006,
+        "spatialReference": {
+          "wkid": 102736,
+          "latestWkid": 2274
+        }
+      },
+      "hasAttachments": false,
+      "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+      "typeIdField": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "type": "esriFieldTypeOID",
+          "alias": "OBJECTID"
+        },
+        {
+          "name": "ZONE_DESC",
+          "type": "esriFieldTypeString",
+          "alias": "Zoning",
+          "length": 100,
+          "domain": {
+            "type": "codedValue",
+            "note": "22 coded values naming the overlay type (Adult Entertainment, Airport Impact, Bed and Breakfast, ...)"
+          }
+        },
+        {
+          "name": "CASE_NO",
+          "type": "esriFieldTypeString",
+          "alias": "Case #",
+          "length": 20
+        },
+        {
+          "name": "ORDINANCE",
+          "type": "esriFieldTypeString",
+          "alias": "Ordinance #",
+          "length": 20
+        },
+        {
+          "name": "ORD_DATE",
+          "type": "esriFieldTypeDate",
+          "alias": "Date Effective",
+          "length": 8
+        },
+        {
+          "name": "SHAPE",
+          "type": "esriFieldTypeGeometry",
+          "alias": "SHAPE"
+        },
+        {
+          "name": "GlobalID",
+          "type": "esriFieldTypeGlobalID",
+          "alias": "GlobalID",
+          "length": 38
+        },
+        {
+          "name": "created_user",
+          "type": "esriFieldTypeString",
+          "alias": "created_user",
+          "length": 255
+        },
+        {
+          "name": "created_date",
+          "type": "esriFieldTypeDate",
+          "alias": "created_date",
+          "length": 8
+        },
+        {
+          "name": "last_edited_user",
+          "type": "esriFieldTypeString",
+          "alias": "last_edited_user",
+          "length": 255
+        },
+        {
+          "name": "last_edited_date",
+          "type": "esriFieldTypeDate",
+          "alias": "last_edited_date",
+          "length": 8
+        },
+        {
+          "name": "SHAPE.STArea()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STArea()"
+        },
+        {
+          "name": "SHAPE.STLength()",
+          "type": "esriFieldTypeDouble",
+          "alias": "SHAPE.STLength()"
+        }
+      ],
+      "maxRecordCount": 2000,
+      "supportedQueryFormats": "JSON, geoJSON",
+      "useStandardizedQueries": true,
+      "supportsStatistics": true,
+      "supportsAdvancedQueries": true,
+      "supportsDatumTransformation": true,
+      "advancedQueryCapabilities": {
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsPagination": true,
+        "supportsTrueCurve": true,
+        "supportsReturningQueryExtent": true,
+        "supportsQueryWithDistance": true,
+        "supportsSqlExpression": true,
+        "supportsQueryWithResultType": false,
+        "supportsReturningGeometryCentroid": false
+      },
+      "capabilities": "Map,Query,Data"
+    }
+  ],
+  "tables": []
+}

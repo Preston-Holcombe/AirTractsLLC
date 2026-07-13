@@ -1,0 +1,85 @@
+{
+  "serviceDescription": "",
+  "mapName": "Map",
+  "description": "",
+  "copyrightText": "",
+  "supportsDynamicLayers": false,
+  "layers": [
+    {
+      "id": 0,
+      "name": "Property (NO DATA)",
+      "parentLayerId": -1,
+      "defaultVisibility": true,
+      "subLayerIds": null,
+      "minScale": 10000,
+      "maxScale": 0,
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon"
+    }
+  ],
+  "tables": [
+    {
+      "id": 5,
+      "name": "Zoning History"
+    },
+    {
+      "id": 4,
+      "name": "Permit History"
+    },
+    {
+      "id": 3,
+      "name": "Property History"
+    },
+    {
+      "id": 2,
+      "name": "Ownership History"
+    },
+    {
+      "id": 6,
+      "name": "Assessment History"
+    },
+    {
+      "id": 7,
+      "name": "Assessor Account Numbers"
+    }
+  ],
+  "spatialReference": {
+    "wkid": 102736,
+    "latestWkid": 2274
+  },
+  "singleFusedMapCache": false,
+  "initialExtent": {
+    "xmin": 1630265.9014562715,
+    "ymin": 597102.1925073664,
+    "xmax": 1843845.414528678,
+    "ymax": 753631.6074570764,
+    "spatialReference": {
+      "wkid": 102736,
+      "latestWkid": 2274
+    }
+  },
+  "fullExtent": {
+    "xmin": 1656737.5167918056,
+    "ymin": 595512.3999146372,
+    "xmax": 1817373.7991931438,
+    "ymax": 755221.4000498056,
+    "spatialReference": {
+      "wkid": 102736,
+      "latestWkid": 2274
+    }
+  },
+  "minScale": 10000,
+  "maxScale": 0,
+  "units": "esriFeet",
+  "documentInfo": {
+    "Title": "Map",
+    "Keywords": "Permits,Ownership,Zoning,Assessment"
+  },
+  "capabilities": "Map,Query,Data",
+  "supportedQueryFormats": "JSON, geoJSON, PBF",
+  "supportsQueryDataElements": true,
+  "supportsDatumTransformation": true,
+  "maxRecordCount": 100,
+  "maxImageHeight": 4096,
+  "maxImageWidth": 4096
+}

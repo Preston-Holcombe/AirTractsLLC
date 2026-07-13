@@ -1,0 +1,207 @@
+{
+  "currentVersion": 10.81,
+  "serviceDescription": "This layer contains the base zoning for all of Davidson County except for the areas within Satellite Cities. These cities maintain their own zoning.",
+  "mapName": "Layers",
+  "supportsDynamicLayers": false,
+  "layers": [
+    {
+      "id": 0,
+      "name": "Adult Entertainment Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 1,
+      "name": "Historic Bed and Breakfast Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 2,
+      "name": "Contextual Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 3,
+      "name": "Historic Landmark Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 4,
+      "name": "Historic Preservation Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 5,
+      "name": "I-440 Impact Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 6,
+      "name": "Instiutional Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 7,
+      "name": "Historic Neighborhood Conservation Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 8,
+      "name": "Neighborhood Landmark Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 9,
+      "name": "Planned Unit Development",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 100000,
+      "maxScale": 0,
+      "defaultVisibility": true
+    },
+    {
+      "id": 10,
+      "name": "Urban Design Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 12,
+      "name": "Airport Impact Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 13,
+      "name": "Urban Zoning Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 14,
+      "name": "Zoning",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": true
+    },
+    {
+      "id": 15,
+      "name": "Residential Accessory Structure Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 16,
+      "name": "Corridor Design Overlay District",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 19,
+      "name": "Floodplain Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    },
+    {
+      "id": 21,
+      "name": "Detatched Accessory Dwelling Unit Overlay",
+      "type": "Feature Layer",
+      "geometryType": "esriGeometryPolygon",
+      "minScale": 0,
+      "maxScale": 0,
+      "defaultVisibility": false
+    }
+  ],
+  "tables": [],
+  "spatialReference": {
+    "wkid": 102736,
+    "latestWkid": 2274
+  },
+  "singleFusedMapCache": false,
+  "initialExtent": {
+    "xmin": 1739695.9737968214,
+    "ymin": 668568.5918745014,
+    "xmax": 1756761.946019044,
+    "ymax": 678447.0640967239,
+    "spatialReference": {
+      "wkid": 102736,
+      "latestWkid": 2274
+    }
+  },
+  "fullExtent": {
+    "xmin": 1649210.5352083296,
+    "ymin": 595512.4166666716,
+    "xmax": 1818505,
+    "ymax": 755251.400000006,
+    "spatialReference": {
+      "wkid": 102736,
+      "latestWkid": 2274
+    }
+  },
+  "units": "esriFeet",
+  "documentInfo": {
+    "Keywords": "Nashville,Zoning"
+  },
+  "capabilities": "Map,Query,Data",
+  "supportedQueryFormats": "JSON, geoJSON",
+  "supportsDatumTransformation": true,
+  "maxRecordCount": 2000,
+  "maxImageHeight": 4096,
+  "maxImageWidth": 4096,
+  "supportedExtensions": "NetFindNearFeaturesRESTSOE"
+}
