@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Land Air Tracks — Davidson County Live</title>
+<title>Air Tracts Live — Davidson County Live</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -96,6 +96,10 @@ tr:hover td{background:#f3f0e4}
 tr.sel td{background:#fbe9e1}
 .empty{padding:26px;text-align:center;color:var(--muted);font-size:12px}
 
+/* ZIP-picker wash blends with the tiles underneath (roads/labels stay legible)
+   instead of sitting as a flat opaque layer on top of them */
+.zip-poly{mix-blend-mode:multiply}
+
 /* ── popup ── */
 .leaflet-popup-content-wrapper{border-radius:2px;border:1px solid var(--ink);font-family:var(--sans)}
 .pp{font-size:11.5px;min-width:215px}
@@ -119,7 +123,7 @@ footer{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(
 </head>
 <body>
 <header>
-  <h1>Land <span>Air</span> Tracks</h1>
+  <h1><span>Air</span> Tracts Live</h1>
   <div class="sheet">DAVIDSON CO. TN · LIVE CADASTRAL CONSOLE · SHEET 1 OF 1</div>
   <nav>
     <button id="tab-leads" class="on">Land Leads</button>
@@ -150,7 +154,11 @@ footer{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(
     <fieldset><legend>Owner</legend>
       <div class="row"><label for="ld-years">Held more than (yrs)</label><input type="number" id="ld-years" value="5" step="1" min="0"></div>
       <div class="row"><label for="ld-excl">Exclude gov / church / HOA / bank</label><input type="checkbox" id="ld-excl" checked style="flex:0 0 auto"></div>
-      <div class="hint">LLC / trust / holdings owners stay in — they're leads, not noise.</div>
+      <div class="hint">Trust / holdings owners stay in — they're leads, not noise.</div>
+      <div class="row"><label for="ld-excl-llc">Exclude LLC-owned parcels</label><input type="checkbox" id="ld-excl-llc" checked style="flex:0 0 auto"></div>
+      <div class="hint">Parcels owned by an LLC don't appear in results at all. Applies on next sweep.</div>
+      <div class="row"><label for="ld-excl-inc">Exclude ", Inc" owned parcels</label><input type="checkbox" id="ld-excl-inc" checked style="flex:0 0 auto"></div>
+      <div class="hint">Same as above, for corporations (", Inc"). Applies on next sweep.</div>
     </fieldset>
     <fieldset><legend>District</legend>
       <div class="row"><label><input type="checkbox" id="ld-usd" checked> USD</label><label><input type="checkbox" id="ld-gsd" checked> GSD</label></div>
@@ -162,6 +170,17 @@ footer{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(
     <fieldset><legend>Live viewport</legend>
       <div class="row"><label for="ld-live">Refresh as I pan the map</label><input type="checkbox" id="ld-live" style="flex:0 0 auto"></div>
       <div class="hint">Applies the filters above to whatever's in view (zoom 15+). Ignores ZIP checkboxes.</div>
+    </fieldset>
+    <fieldset><legend>Wholesale offer</legend>
+      <div class="row"><label for="ld-offer">Compute max bid / initial offer</label><input type="checkbox" id="ld-offer" checked style="flex:0 0 auto"></div>
+      <div class="hint">On by default — every priceable lot gets a comp-based offer. It's a heavy second pass (full comp classification for every ZIP + its neighbors); a broad sweep across many ZIPs will take a while. Stop still cancels it.</div>
+      <div class="row"><label for="ld-cyears">Comp window (yrs)</label><input type="number" id="ld-cyears" value="5" min="1"></div>
+      <div class="row"><label for="ld-cband">Acreage band (± ac)</label><input type="number" id="ld-cband" value="0.3" step="0.1" min="0"></div>
+      <div class="row"><label for="ld-ccap">Comp acreage ceiling</label><input type="number" id="ld-ccap" value="3" step="0.5" min="0"></div>
+      <div class="row"><label for="ld-cmin">Min comps required</label><input type="number" id="ld-cmin" value="3" step="1" min="1"></div>
+      <div class="row"><label for="ld-pct">Initial offer = % of median</label><input type="number" id="ld-pct" value="30" step="5" min="0"></div>
+      <div class="row"><label for="ld-disc">Max offer = median − $</label><input type="number" id="ld-disc" value="20000" step="5000" min="0"></div>
+      <div class="hint">Comps = residential vacant-land purchases in this ZIP + adjacent ZIPs, over the comp window. Starts at the acreage band above; if that comes up short of "Min comps required" the band widens automatically (2x, 4x, then the whole ZIP cluster regardless of acreage) until it clears the minimum or the cluster runs out of comps. Check "Comp basis" per lot to see how wide it had to go.</div>
     </fieldset>
   </section>
 
@@ -191,12 +210,14 @@ footer{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(
   <!-- ─────────── LAND COMPS ─────────── -->
   <section class="panel" id="panel-comps">
     <h2>Land Comps</h2>
-    <p class="blurb">Every market sale of a lot that was <b>unimproved when it traded</b> — including lots since built on — with sold-and-resold chains flagged.</p>
+    <p class="blurb">Every purchase of a lot that was <b>vacant land at the time it was bought</b> — including lots since built on — classified by assessment history, permit history, and current land use. Sold-and-resold chains flagged.</p>
     <div class="runbar"><button class="run" id="run-comps">Run comps</button></div>
+    <fieldset><legend>ZIP codes</legend>
+      <div class="zips" id="cp-zips"></div>
+      <div class="ziptools"><button id="cp-zall">All</button><button id="cp-znone">None</button><button id="cp-zcore">Urban core</button></div>
+    </fieldset>
     <fieldset><legend>Windows</legend>
       <div class="row"><label for="cp-years">Sales window (yrs)</label><input type="number" id="cp-years" value="5" min="1"></div>
-      <div class="row"><label for="cp-lead">Assessment lead-in (mo)</label><input type="number" id="cp-lead" value="18" min="0"></div>
-      <div class="hint">Assessments are pulled this many months before the sales window so early sales still classify.</div>
     </fieldset>
     <fieldset><legend>Sale filters</legend>
       <div class="row"><label for="cp-floor">Price &gt;</label><input type="number" id="cp-floor" value="1000" step="500"></div>
@@ -205,11 +226,13 @@ footer{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(
     </fieldset>
     <fieldset><legend>Vacancy test</legend>
       <div class="row"><label for="cp-tol">Improvement value ≤ $</label><input type="number" id="cp-tol" value="0" step="1000"></div>
-      <div class="hint">Latest assessment on or before the sale date must have improvement value at or under this. Raise to ~5000 to tolerate sheds.</div>
+      <div class="hint">Assessment-confirmed signal only. Latest assessment on/before the sale must have improvement value at or under this. Raise to ~5000 to tolerate sheds.</div>
     </fieldset>
     <fieldset><legend>Results</legend>
       <div class="row"><label for="cp-chains">Resold-parcel chains only</label><input type="checkbox" id="cp-chains" style="flex:0 0 auto"></div>
       <div class="hint">Show only parcels that traded 2+ times in the window — the wholesaling picture.</div>
+      <div class="row"><label for="cp-unknown">Include sales with no vacancy signal</label><input type="checkbox" id="cp-unknown" style="flex:0 0 auto"></div>
+      <div class="hint">Off by default — only vacant-at-purchase sales show. Check this to also see sales none of the three signals could classify.</div>
     </fieldset>
   </section>
 </aside>
@@ -221,10 +244,10 @@ footer{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(
   </div>
 </main>
 </div>
-<footer><span>SOURCES: maps.nashville.gov /arcgis + /arcgis2 (live)</span><span>NO BACKEND · NO SCHEDULED JOBS</span><span id="ft-status"></span></footer>
+<footer><span>SOURCES: maps.nashville.gov /arcgis + /arcgis2 (live)</span><span id="cache-status">CACHE: checking…</span><span id="ft-status"></span></footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* ══════════════ Land Air Tracks — live console ══════════════
+/* ══════════════ Air Tracts Live — live console ══════════════
    All queries hit Metro Nashville's public ArcGIS endpoints from
    the browser. Schema reference: api/NASHVILLE_PARCELS_API.md   */
 'use strict';
@@ -234,11 +257,22 @@ const EP = {
   cad:    'https://maps.nashville.gov/arcgis/rest/services/Cadastral/Parcels/MapServer/0/query',
   deeds:  'https://maps.nashville.gov/arcgis2/rest/services/Parcels/ParcelHistory/MapServer/2/query',
   assess: 'https://maps.nashville.gov/arcgis2/rest/services/Parcels/ParcelHistory/MapServer/6/query',
+  permit: 'https://maps.nashville.gov/arcgis2/rest/services/Parcels/ParcelHistory/MapServer/4/query',
+  zips:   'https://maps.nashville.gov/arcgis/rest/services/Boundaries/Boundaries/MapServer/0/query',
   zoning: 'https://maps.nashville.gov/arcgis/rest/services/Zoning_Landuse/Zoning/MapServer/14/query',
   flood:  'https://maps.nashville.gov/arcgis/rest/services/Zoning_Landuse/Zoning/MapServer/19/query'
 };
 const HIST_PAGE = 100;   /* arcgis2 hard cap */
 const CAD_PAGE  = 1000;
+
+/* SUB_TYPE codes for ground-up home construction only (single family, duplex,
+   townhome, condo/multifamily buildings) — excludes sheds/garages/pools/carports/
+   DADUs/accessory apartments, which get added onto an ALREADY-improved lot and
+   don't prove the parcel was vacant at purchase. Must be paired with
+   CASE_TYPE IN ('CARN','CACN') — the same SUB_TYPE also appears under CARA
+   (addition) permits, which are not new construction. See PARCEL_HISTORY notes. */
+const NEW_CONSTRUCTION_SUB_TYPES = ['CAA01R301','CAA02R302','CAA15R301','DPLX2CNDO',
+ 'CAA03R301','CAA03R201','CAA03R298','CAA03R299','CAA03R398'];
 
 const DAVIDSON_ZIPS = ["37013","37027","37072","37076","37080","37115","37138","37189",
  "37201","37203","37204","37205","37206","37207","37208","37209","37210","37211","37212",
@@ -256,6 +290,20 @@ const DEFAULT_BUILDERS = ["MERITAGE","RYAN HOMES","NVR","BEAZER","DREES","LEGACY
  "ERMAC DRIVE","NORTHERN HORIZONS","CLEAR CREEK","COLE WOODWORKS","UNIQUE MANAGEMENT",
  "EPG CONSTRUCTION","PREMIER CONSTRUCTION"];
 
+/* ── vacancy-classification tagging helpers (shared by Land Comps + Land Leads offers) ── */
+function isKnownBuilder(name){
+  if (!name) return false;
+  const u = name.toUpperCase();
+  return DEFAULT_BUILDERS.some(b=>u.includes(b));
+}
+function propertyCategory(apn, luDesc){
+  if (apn && /CO$/.test(apn.trim())) return 'CondoUnit';
+  if (!luDesc) return 'Unknown';
+  if (luDesc.includes('VACANT')) return 'VacantLand';
+  if (['SINGLE FAMILY','DUPLEX','RESIDENTIAL CONDO','RESIDENTIAL COMBO/MISC'].includes(luDesc)) return 'BuiltResidential';
+  return 'CommercialOrOther';
+}
+
 /* ── tiny utils ── */
 const $ = id => document.getElementById(id);
 const num = id => parseFloat($(id).value) || 0;
@@ -263,11 +311,9 @@ const fmt$ = v => v==null ? '' : '$' + Math.round(v).toLocaleString();
 const fmtN = (v,d=2) => v==null ? '' : v.toLocaleString(undefined,{maximumFractionDigits:d});
 const msToISO = ms => ms==null ? '' : new Date(ms).toISOString().slice(0,10);
 const isoNYearsAgo = y => { const d=new Date(); d.setFullYear(d.getFullYear()-y); return d.toISOString().slice(0,10); };
-const isoNMonthsBefore = (iso,m) => { const d=new Date(iso); d.setMonth(d.getMonth()-m); return d.toISOString().slice(0,10); };
 const chunk = (a,n) => { const o=[]; for(let i=0;i<a.length;i+=n) o.push(a.slice(i,i+n)); return o; };
 const sqlEsc = s => String(s).replace(/'/g,"''");
 const escHtml = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
 /* ── run state / progress ── */
 let ctl = null, running = false;
 function startRun(btn){
@@ -306,6 +352,75 @@ async function aq(url, params, signal){
   if (j.error) throw new Error('ArcGIS: '+(j.error.message||JSON.stringify(j.error.details||j.error)));
   return j;
 }
+/* POST variant — needed when params (e.g. a ZIP boundary polygon) are too large for a GET query string */
+async function aqPost(url, params, signal){
+  const p = new URLSearchParams(params); p.set('f','json');
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:p.toString(), signal});
+  if (!r.ok) throw new Error('HTTP '+r.status+' from '+url.split('/services/')[1].split('/query')[0]);
+  const j = await r.json();
+  if (j.error) throw new Error('ArcGIS: '+(j.error.message||JSON.stringify(j.error.details||j.error)));
+  return j;
+}
+/* ── local caching server (server.js) — optional, auto-detected ──────────
+   If running (`node server.js`), every tool persists its raw + result data
+   as CSVs under data/<zip>/ — the same schema Get-LandComps.ps1 -Persist
+   writes — and reads from it first so repeat runs only fetch what changed.
+   If not running (e.g. the file was opened directly instead of served),
+   every call below just no-ops and everything falls back to the original
+   always-live behavior. No errors, no degraded functionality either way. */
+let cacheAvailable = false;
+async function checkCacheServer(){
+  try {
+    const ctl = new AbortController();
+    const t = setTimeout(()=>ctl.abort(), 1500);
+    const r = await fetch('/api/health', {signal: ctl.signal});
+    clearTimeout(t);
+    cacheAvailable = r.ok;
+  } catch(e){ cacheAvailable = false; }
+  updateCacheStatus();
+  return cacheAvailable;
+}
+function updateCacheStatus(){
+  const el = $('cache-status');
+  if (!el) return;
+  el.textContent = cacheAvailable ? 'CACHE: ON' : 'CACHE: OFF — run "node server.js" for persistence';
+  el.style.color = cacheAvailable ? 'var(--field)' : 'var(--muted)';
+}
+async function loadCsvCache(relPath){
+  if (!cacheAvailable) return [];
+  try {
+    const r = await fetch(`/api/csv?path=${encodeURIComponent(relPath)}`);
+    return r.ok ? await r.json() : [];
+  } catch(e){ return []; }
+}
+async function saveCsvCache(relPath, rows){
+  if (!cacheAvailable) return;
+  try {
+    await fetch(`/api/csv?path=${encodeURIComponent(relPath)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(rows)
+    });
+  } catch(e){ console.error('cache save failed:', relPath, e); }
+}
+checkCacheServer();
+
+/* ZIP-boundary adjacency: fetch the target ZIP's polygon, then find every ZIP
+   whose polygon intersects it (self included). Cached per ZIP since many leads
+   share the same ZIP. */
+const zipAdjacencyCache = new Map();
+async function getAdjacentZips(zip, signal){
+  if (zipAdjacencyCache.has(zip)) return zipAdjacencyCache.get(zip);
+  const promise = (async ()=>{
+    const target = await aq(EP.zips, {where:`ZipCode='${zip}'`, outFields:'ZipCode', returnGeometry:'true', outSR:102100}, signal);
+    const geom = (target.features||[])[0]?.geometry;
+    if (!geom) return [zip];
+    const r = await aqPost(EP.zips, {geometry:JSON.stringify(geom), geometryType:'esriGeometryPolygon', inSR:102100,
+      spatialRel:'esriSpatialRelIntersects', outFields:'ZipCode', returnGeometry:'false'}, signal);
+    const zips = [...new Set((r.features||[]).map(f=>f.attributes.ZipCode).filter(Boolean))];
+    return zips.length ? zips : [zip];
+  })();
+  zipAdjacencyCache.set(zip, promise);
+  return promise;
+}
 /* drain one WHERE via resultOffset paging */
 async function pageAll(url, params, pageSize, signal, onPage){
   const out=[]; let offset=0;
@@ -340,7 +455,12 @@ async function pool(items, size, signal, worker, onDone){
 const map = L.map('map',{zoomControl:true}).setView([36.166,-86.78],11);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
   {attribution:'&copy; OpenStreetMap &copy; CARTO', maxZoom:20}).addTo(map);
+/* dedicated pane, below the default overlay pane, so swept results always sit
+   on top of the ZIP-picker wash rather than the other way around */
+map.createPane('zipPane');
+map.getPane('zipPane').style.zIndex = 350;
 const resultLayer = L.layerGroup().addTo(map);
+const zipLayer = L.layerGroup().addTo(map);  /* interactive ZIP-picker overlay, Land Leads tab only */
 const POLY_LIMIT = 1600;  /* above this, dots instead of lot lines */
 
 function ringsToLatLngs(geom){
@@ -422,6 +542,10 @@ function renderTable(){
     h+=`<tr data-i="${tblRows.indexOf(r)}">`;
     tblCols.forEach(c=>{
       let v = r[c.k];
+      if (c.f==='link'){
+        h+=`<td>${v?`<a href="${escHtml(v)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${c.label||'Open ↗'}</a>`:''}</td>`;
+        return;
+      }
       if (c.f==='$') v = fmt$(v);
       else if (c.f==='n') v = fmtN(v, c.d??2);
       else if (c.f==='d') v = v||'';
@@ -448,23 +572,85 @@ $('csv').onclick = ()=>{
   tblRows.forEach(r=>lines.push(tblCols.map(c=>esc(r[c.k])).join(',')));
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
-  a.download = `land_air_tracks_${activeTab}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = `air_tracts_live_${activeTab}_${new Date().toISOString().slice(0,10)}.csv`;
   a.click(); URL.revokeObjectURL(a.href);
 };
 
-/* ══════════════ TAB 1 · LAND LEADS ══════════════ */
-(function buildZipGrid(){
-  const g = $('ld-zips');
+/* ══════════════ shared: ZIP-grid builder (Land Leads + Land Comps) ══════════════ */
+function buildZipGrid(prefix, defaultChecked){
+  const g = $(prefix+'-zips');
   DAVIDSON_ZIPS.forEach(z=>{
     const l=document.createElement('label');
-    l.innerHTML=`<input type="checkbox" value="${z}" checked> ${z}`;
+    l.innerHTML=`<input type="checkbox" value="${z}"${defaultChecked?' checked':''}> ${z}`;
     g.appendChild(l);
   });
   const set = fn => g.querySelectorAll('input').forEach(cb=>cb.checked=fn(cb.value));
-  $('ld-zall').onclick = ()=>set(()=>true);
-  $('ld-znone').onclick = ()=>set(()=>false);
-  $('ld-zcore').onclick = ()=>set(z=>CORE_ZIPS.includes(z));
-})();
+  $(prefix+'-zall').onclick = ()=>set(()=>true);
+  $(prefix+'-znone').onclick = ()=>set(()=>false);
+  $(prefix+'-zcore').onclick = ()=>set(z=>CORE_ZIPS.includes(z));
+}
+
+/* ══════════════ TAB 1 · LAND LEADS ══════════════ */
+buildZipGrid('ld', false);
+
+/* ── interactive ZIP-picker map ── faint boundaries by default; hover
+   solidifies the stroke; click toggles that ZIP's checkbox AND fills the
+   polygon translucent orange. Checkboxes stay the single source of truth —
+   the map is just another way to drive the same state. ── */
+const zipPolygons = new Map();  /* zip -> L.Polygon[] — several ZIPs have multiple disjoint pieces */
+function zipStyle(zip, hovering){
+  const cb = document.querySelector(`#ld-zips input[value="${zip}"]`);
+  const selected = !!(cb && cb.checked);
+  /* outline stays the Run Sweep red (--stamp); fill is yellow. Kept deliberately
+     subtle — a solid fill (even blended) was still drowning out street names —
+     so the DEFAULT state has no fill at all (fill:true only for click hit-testing)
+     and even hover/select stays light. pane + className push it behind results
+     and blend whatever fill remains with the tiles instead of sitting flatly on top. */
+  const base = {pane:'zipPane', className:'zip-poly'};
+  if (selected || hovering) return {...base, color:'#c2481e', weight:2, opacity:0.85, fill:true, fillColor:'#f5c518', fillOpacity:0.18};
+  return {...base, color:'#c2481e', weight:1, opacity:0.35, fill:true, fillColor:'#f5c518', fillOpacity:0};
+}
+function restyleZip(zip, hovering){
+  const style = zipStyle(zip, hovering);
+  (zipPolygons.get(zip)||[]).forEach(lyr=>lyr.setStyle(style));
+}
+function syncZipMapFromCheckboxes(){
+  zipPolygons.forEach((_, zip) => restyleZip(zip, false));
+}
+function toggleZip(zip){
+  // once a sweep has results on the map, clicks there are for interacting with
+  // parcels — the checkboxes are still the way to change ZIP selection then
+  if (resultLayer.getLayers().length) return;
+  const cb = document.querySelector(`#ld-zips input[value="${zip}"]`);
+  if (!cb) return;
+  cb.checked = !cb.checked;
+  restyleZip(zip, false);
+}
+async function initZipMap(){
+  try{
+    const zipList = DAVIDSON_ZIPS.map(z=>`'${z}'`).join(',');
+    const r = await aq(EP.zips, {where:`ZipCode IN (${zipList})`, outFields:'ZipCode', returnGeometry:'true', outSR:4326});
+    (r.features||[]).forEach(f=>{
+      const zip = f.attributes.ZipCode;
+      const ll = ringsToLatLngs(f.geometry);
+      if (!zip || !ll) return;
+      const lyr = L.polygon(ll, zipStyle(zip, false));
+      lyr.on('mouseover', ()=>restyleZip(zip, true));
+      lyr.on('mouseout', ()=>restyleZip(zip, false));
+      lyr.on('click', ()=>toggleZip(zip));
+      lyr.addTo(zipLayer);
+      if (!zipPolygons.has(zip)) zipPolygons.set(zip, []);
+      zipPolygons.get(zip).push(lyr);
+    });
+  }catch(e){ console.error('ZIP map init failed', e); }
+}
+initZipMap();
+$('ld-zips').addEventListener('change', e=>{
+  if (e.target.matches('input[type=checkbox]')) restyleZip(e.target.value, false);
+});
+$('ld-zall').addEventListener('click', syncZipMapFromCheckboxes);
+$('ld-znone').addEventListener('click', syncZipMapFromCheckboxes);
+$('ld-zcore').addEventListener('click', syncZipMapFromCheckboxes);
 
 function leadsWhereCore(){
   const parts=[];
@@ -478,6 +664,8 @@ function leadsWhereCore(){
   if (num('ld-acres')>0) parts.push(`Acres >= ${num('ld-acres')}`);
   if (num('ld-front')>0) parts.push(`Front >= ${num('ld-front')}`);
   if ($('ld-excl').checked) OWNER_EXCLUSIONS.forEach(t=>parts.push(`Owner NOT LIKE '%${sqlEsc(t)}%'`));
+  if ($('ld-excl-llc').checked) parts.push("Owner NOT LIKE '%LLC%'");
+  if ($('ld-excl-inc').checked) parts.push("Owner NOT LIKE '%, INC%'");
   if (num('ld-years')>0) parts.push(`OwnDate < '${isoNYearsAgo(num('ld-years'))}'`);  /* plain string — DATE'' 404s here */
   return parts;
 }
@@ -486,7 +674,12 @@ const LEAD_COLS = [
   {k:'PropAddr',t:'Address'},{k:'PropZip',t:'ZIP'},{k:'Acres',t:'Acres',f:'n'},
   {k:'Front',t:'Front',f:'n',d:0},{k:'LUDesc',t:'Land use'},{k:'Owner',t:'Owner'},
   {k:'ownerLoc',t:'Owner loc'},{k:'yearsHeld',t:'Yrs held',f:'n',d:1},
-  {k:'LandAppr',t:'Land appr',f:'$'},{k:'TotlAppr',t:'Total appr',f:'$'},{k:'APN',t:'APN'}
+  {k:'LandAppr',t:'Land appr',f:'$'},{k:'TotlAppr',t:'Total appr',f:'$'},
+  {k:'compMedian',t:'Comp median',f:'$'},{k:'compCount',t:'# comps',f:'n',d:0},{k:'compBasis',t:'Comp basis'},
+  {k:'initialOffer',t:'Initial offer',f:'$'},{k:'maxOffer',t:'Max offer',f:'$'},
+  {k:'APN',t:'APN'},
+  {k:'parcelViewerUrl',t:'Parcel',f:'link',label:'Viewer ↗'},
+  {k:'streetViewUrl',t:'Street View',f:'link',label:'View ↗'}
 ];
 function shapeLead(f, zip){
   const a=f.attributes;
@@ -496,6 +689,9 @@ function shapeLead(f, zip){
   if (zip && !a.PropZip) a.PropZip = zip;
   a._latlngs = ringsToLatLngs(f.geometry);
   a._center = centroidOf(a._latlngs);
+  a.parcelViewerUrl = a.APN ? 'https://maps.nashville.gov/ParcelViewer/?parcelID='+encodeURIComponent(a.APN) : '';
+  /* street view by parcel centroid coordinates, not address — accurate for lots with no house yet */
+  a.streetViewUrl = a._center ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${a._center[0]},${a._center[1]}` : '';
   return a;
 }
 const leadPopup = r => `<div class="pp"><h3>${escHtml(r.PropAddr||'(no address)')}</h3>
@@ -505,7 +701,11 @@ const leadPopup = r => `<div class="pp"><h3>${escHtml(r.PropAddr||'(no address)'
   <dt>Held since</dt><dd>${r.OwnDate} (${r.yearsHeld} yrs)</dd>
   <dt>Acres / front</dt><dd>${fmtN(r.Acres)} / ${fmtN(r.Front,0)}′</dd>
   <dt>Use</dt><dd>${escHtml(r.LUDesc)}</dd>
-  <dt>Land / total appr</dt><dd>${fmt$(r.LandAppr)} / ${fmt$(r.TotlAppr)}</dd></dl>
+  <dt>Land / total appr</dt><dd>${fmt$(r.LandAppr)} / ${fmt$(r.TotlAppr)}</dd>
+  ${r.compMedian!=null?`<dt>Comp median</dt><dd>${fmt$(r.compMedian)} (${r.compCount} comps, ${escHtml(r.compBasis)})</dd>
+  <dt>Initial / max offer</dt><dd>${fmt$(r.initialOffer)} / ${fmt$(r.maxOffer)}</dd>`:''}</dl>
+  <a href="${escHtml(r.parcelViewerUrl)}" target="_blank" rel="noopener">Parcel viewer ↗</a> ·
+  <a href="${escHtml(r.streetViewUrl)}" target="_blank" rel="noopener">Street View ↗</a>
   <button class="zbtn">Zoning + flood check</button><div class="zres"></div></div>`;
 
 $('run-leads').onclick = async ()=>{
@@ -523,17 +723,105 @@ $('run-leads').onclick = async ()=>{
         CAD_PAGE, signal);
       feats.forEach(f=>rows.push(shapeLead(f,z)));
     }
-    finishLeads(rows, `${zips.length} ZIPs swept`);
+    await finishLeads(rows, `${zips.length} ZIPs swept`, signal);
   }catch(e){ fail(e); }
 };
 
-function finishLeads(rows, how){
+/* keeps only the display columns of a row set (strips internal _-prefixed
+   fields like _latlngs/_center before writing to CSV) */
+function projectRows(rows, cols){
+  return rows.map(r=>{ const o={}; cols.forEach(c=>{ o[c]=r[c]; }); return o; });
+}
+async function saveLeadsCache(rows){
+  if (!cacheAvailable || !rows.length) return;
+  const cols = LEAD_COLS.map(c=>c.k);
+  const byZip = {};
+  rows.forEach(r=>{ const z = r.PropZip||'unknown'; (byZip[z] ||= []).push(r); });
+  await Promise.all(Object.entries(byZip).map(([zip, zrows]) =>
+    saveCsvCache(zipCachePath(zip,'leads'), projectRows(zrows, cols))
+  ));
+}
+
+async function finishLeads(rows, how, signal){
   setResults(LEAD_COLS, rows, 'lots');
   drawResults(rows, leadPopup);
   const absentee = rows.filter(r=>r.OwnState && r.OwnState.trim() && r.OwnState.trim()!=='TN').length;
   const medAcres = median(rows.map(r=>r.Acres).filter(v=>v>0));
-  showSummary(`<b>${rows.length.toLocaleString()}</b> lead lots · ${how}\nmedian <b>${fmtN(medAcres)}</b> ac · <b>${absentee.toLocaleString()}</b> out-of-state owners`);
+  const summaryBase = `<b>${rows.length.toLocaleString()}</b> lead lots · ${how}\nmedian <b>${fmtN(medAcres)}</b> ac · <b>${absentee.toLocaleString()}</b> out-of-state owners`;
+  showSummary(summaryBase);
+  if ($('ld-offer').checked && rows.length && signal){
+    try{
+      const priced = await computeWholesaleOffers(rows, signal);
+      renderTable();
+      showSummary(summaryBase+`\n<b>${priced}</b> of ${rows.length.toLocaleString()} lots priced (min ${num('ld-cmin')} comps required)`);
+    }catch(e){
+      if (e.name!=='AbortError'){ console.error(e); showSummary(summaryBase+'\nOffer computation failed — see console. Leads above are still valid.'); }
+    }
+  }
+  await saveLeadsCache(rows);  /* data/<zip>/leads.csv — overwritten each sweep, offer numbers included */
   endRun();
+}
+
+/* ── wholesale offer engine: same-ZIP + adjacent-ZIP residential vacant-land comps ──
+   No ZIP-count cap: Davidson County only has 28 ZIPs total, so the adjacent-ZIP
+   union is inherently bounded. A large sweep (e.g. all 28 ZIPs checked) will take
+   a while — the progress bar shows what's happening, and Stop still cancels it. */
+async function computeWholesaleOffers(rows, signal){
+  const band = num('ld-cband'), ceil = num('ld-ccap'), minComps = num('ld-cmin')||1,
+        pct = num('ld-pct'), disc = num('ld-disc'), since = isoNYearsAgo(num('ld-cyears'));
+
+  const homeZips = [...new Set(rows.map(r=>r.PropZip).filter(Boolean))];
+  if (!homeZips.length) return 0;
+
+  setProg(0,1,`Comps: resolving adjacent ZIPs for ${homeZips.length} ZIP(s)…`);
+  const clusterByZip = {};
+  await Promise.all(homeZips.map(async z=>{ clusterByZip[z] = await getAdjacentZips(z, signal); }));
+  const unionZips = [...new Set(Object.values(clusterByZip).flat())];
+
+  const comps = await computeVacantComps(unionZips,
+    {since, priceFloor:1000, priceCeil:0, improvementTolerance:0, includeTrustee:false, includeUnknown:false},
+    signal, (frac,label)=>setProg(frac,1,`Comps: ${label}`));
+
+  /* residential vacant land only, acreage ceiling as an outlier guard — same
+     categories that produced the multi-million-dollar institutional outliers
+     during validation (VACANT COMMERCIAL/INDUSTRIAL/MULTI FAMILY excluded) */
+  const usable = comps.filter(c => c.Acres>0 && c.Acres<=ceil &&
+    c.LUDesc && (c.LUDesc.includes('VACANT RESIDENTIAL') || c.LUDesc.includes('VACANT RURAL')));
+
+  const poolByZip = {};
+  homeZips.forEach(z=>{
+    const cluster = new Set(clusterByZip[z]||[z]);
+    poolByZip[z] = usable.filter(c=>cluster.has(c.PropZip));
+  });
+
+  /* every lot gets priced if its ZIP cluster has ANY comps at all — start at the
+     requested band, then widen (2x, 4x, then no acreage limit) until "min comps
+     required" clears. compBasis records which tier actually fired so you can see
+     the confidence behind each number. */
+  const BAND_TIERS = [
+    {mult:1, label:'Band'}, {mult:2, label:'Band×2'}, {mult:4, label:'Band×4'}, {mult:Infinity, label:'ZIP cluster (no band)'}
+  ];
+  let priced = 0;
+  rows.forEach(r=>{
+    const pool = poolByZip[r.PropZip];
+    r.compMedian=null; r.compCount=0; r.compBasis=null; r.initialOffer=null; r.maxOffer=null;
+    if (!pool || !r.Acres || !pool.length) return;
+    let matched = null, basis = null;
+    for (const tier of BAND_TIERS) {
+      const inBand = tier.mult===Infinity ? pool : pool.filter(c=>Math.abs(c.Acres-r.Acres)<=band*tier.mult);
+      if (inBand.length >= minComps) { matched = inBand; basis = tier.label; break; }
+      if (tier.mult===Infinity && inBand.length) { matched = inBand; basis = `${tier.label} (only ${inBand.length} — below minimum)`; }
+    }
+    if (!matched) return;
+    r.compCount = matched.length;
+    r.compBasis = basis;
+    const med = median(matched.map(c=>c.salePrice));
+    r.compMedian = med;
+    r.initialOffer = Math.round(med * pct/100);
+    r.maxOffer = Math.round(med - disc);
+    priced++;
+  });
+  return priced;
 }
 
 /* live viewport mode (Option B): debounce + in-flight cancellation */
@@ -567,6 +855,31 @@ function median(a){ if(!a.length) return null; const s=[...a].sort((x,y)=>x-y); 
 
 /* ══════════════ TAB 2 · BUILDER FLIPS ══════════════ */
 $('fl-builders').value = DEFAULT_BUILDERS.join('\n');
+/* deed-chain cache: keyed by parcelid only (not by builder keyword — a
+   parcel's chain is the same fact regardless of which search found it) */
+async function loadFlipsChainCache(){
+  const rows = await loadCsvCache('flips/deedchains.csv');
+  const byParcel = {};
+  rows.forEach(r=>{
+    const pid = Number(r.parcelid);
+    if (!(pid in byParcel)) byParcel[pid] = [];
+    if (r.name || r.SalePrice || r.sortdate) byParcel[pid].push({parcelid:pid, name:r.name, SalePrice:parseFloat(r.SalePrice)||0, sortdate:Number(r.sortdate)});
+  });
+  return byParcel;
+}
+async function saveFlipsChainCache(byParcel){
+  if (!cacheAvailable) return;
+  const rows = [];
+  Object.entries(byParcel).forEach(([pid,hist])=>{
+    if (!hist.length) rows.push({parcelid:pid, name:'', SalePrice:'', sortdate:''});
+    else hist.forEach(d=>rows.push({parcelid:d.parcelid, name:d.name, SalePrice:d.SalePrice, sortdate:d.sortdate}));
+  });
+  await saveCsvCache('flips/deedchains.csv', rows);
+}
+async function saveFlipsResultsCache(rows){
+  if (!cacheAvailable || !rows.length) return;
+  await saveCsvCache('flips/results.csv', projectRows(rows, FLIP_COLS.map(c=>c.k)));
+}
 const FLIP_COLS = [
   {k:'PropAddr',t:'Address'},{k:'PropZip',t:'ZIP'},{k:'builder',t:'Builder bought'},
   {k:'landPrice',t:'Paid for land',f:'$'},{k:'landDate',t:'Bought'},
@@ -597,16 +910,23 @@ $('run-flips').onclick = async ()=>{
     purchases = purchases.filter(p=>{ const b=bucket(p.name); perB[b]=(perB[b]||0)+1; return perB[b]<=cap; });
     if (!purchases.length) throw new Error('No land purchases matched. Loosen the price band or add keywords.');
 
-    /* step 2 — full deed chains for those parcels */
+    /* step 2 — full deed chains for those parcels. Cached by parcelid (not by
+       builder keyword) — a parcel's deed chain is the same regardless of which
+       keyword search found it, so it's safe to reuse across different keyword
+       lists, unlike step 1's purchases which stay live for correctness. */
     const ids = [...new Set(purchases.map(p=>p.parcelid).filter(v=>v!=null))];
-    const batches = chunk(ids, 40);
-    setProg(1,4,`2/4 · Deed chains for ${ids.length.toLocaleString()} parcels…`);
-    const histFeats = await pool(batches, 5, signal, b =>
-      pageAll(EP.deeds, {where:`parcelid IN (${b.join(',')}) AND InstrumentType = 'Deed'`,
-        outFields:'parcelid,name,SalePrice,sortdate', orderByFields:'sortdate ASC'}, HIST_PAGE, signal),
-      (d,t)=>setProg(1+d/t,4,`2/4 · Deed chains — batch ${d}/${t}`));
-    const byParcel = {};
-    histFeats.flat().forEach(f=>{ (byParcel[f.attributes.parcelid] ||= []).push(f.attributes); });
+    const byParcel = await loadFlipsChainCache();
+    const needIds = ids.filter(pid=>!(pid in byParcel));
+    setProg(1,4,`2/4 · Deed chains for ${needIds.length.toLocaleString()} new parcel(s) (${(ids.length-needIds.length).toLocaleString()} cached)…`);
+    if (needIds.length){
+      const histFeats = await pool(chunk(needIds,40), 5, signal, b =>
+        pageAll(EP.deeds, {where:`parcelid IN (${b.join(',')}) AND InstrumentType = 'Deed'`,
+          outFields:'parcelid,name,SalePrice,sortdate', orderByFields:'sortdate ASC'}, HIST_PAGE, signal),
+        (d,t)=>setProg(1+d/t,4,`2/4 · Deed chains — batch ${d}/${t}`));
+      histFeats.flat().forEach(f=>{ (byParcel[f.attributes.parcelid] ||= []).push(f.attributes); });
+      needIds.forEach(pid=>{ if (!(pid in byParcel)) byParcel[pid]=[]; });  /* mark checked even if empty */
+      await saveFlipsChainCache(byParcel);
+    }
 
     /* step 3 — match buy → later resale */
     setProg(3,4,'3/4 · Matching resales…');
@@ -655,115 +975,282 @@ $('run-flips').onclick = async ()=>{
       r => r.spread>150000 ? '#2e6e4e' : '#c2481e');
     const medLand = median(flips.map(f=>f.landPrice)), medSp = median(flips.map(f=>f.spread));
     showSummary(`<b>${flips.length}</b> confirmed flips\nmedian land <b>${fmt$(medLand)}</b> · median spread <b>${fmt$(medSp)}</b>\nmedian land price = your wholesale ceiling`);
+    await saveFlipsResultsCache(flips);  /* data/flips/results.csv — overwritten each run */
     endRun();
   }catch(e){ fail(e); }
 };
 
+/* ══════════════ shared: vacant-at-purchase comp engine ══════════════
+   Used by both the Land Comps tab and the Land Leads wholesale-offer engine.
+   Three independent signals, unioned (a sale counts if ANY fires):
+     - AssessmentConfirmed: assessment record on/before the sale shows no
+       improvement. Reliable, but Nashville's assessment-history table on this
+       server only reaches back to 2025-01-01.
+     - PermitInferred: a ground-up home-construction permit was issued after
+       the sale (and before the parcel's next sale, if any). Permit History
+       reaches back to 2006, covering the gap the assessment table can't.
+     - NeverBuilt: parcel is vacant land TODAY and has no home-construction
+       permit on record ever — every sale it's ever had was vacant-land, no
+       date-matching needed.
+   Veto: if a home-construction permit predates a sale, that sale is dropped
+   outright — it's a post-construction resale (e.g. a finished-house sale),
+   never vacant land, even if a stale assessment record would otherwise say
+   AssessmentConfirmed (the county's assessment cycle lags new construction).
+   Candidates = every parcel in the given ZIP(s) — not just currently-vacant
+   ones — so lots that were vacant at purchase but have since been built on
+   still get caught. Returns one row per qualifying sale-hop, cadastral-joined
+   and tagged with vacancyBasis + propertyCategory + buyerIsKnownBuilder.
+
+   Cached per ZIP under data/<zip>/{cadastral,deeds,assessments,permits}.csv —
+   identical schema to Get-LandComps.ps1 -Persist, so the two tools share one
+   cache. Raw data is cached BROADLY (SalePrice>0, Deed/Trustees Deed only, no
+   price band) and reclassified fresh every call; -Since/-PriceFloor/etc are
+   applied as an output filter afterward, so changing them never invalidates
+   the cache. Deeds are watermarked (only fetch newer than what's cached);
+   assessments/permits are fetched once per parcel/APN and never re-fetched
+   (full history doesn't change). If no cache server is running, every cache
+   call below is a no-op and this behaves exactly like a fresh live pull. */
+const zipCachePath = (zip, name) => `${zip}/${name}.csv`;
+
+async function loadZipCache(zip){
+  const [cadRows, deedRows, assessRows, permitRows] = await Promise.all([
+    loadCsvCache(zipCachePath(zip,'cadastral')), loadCsvCache(zipCachePath(zip,'deeds')),
+    loadCsvCache(zipCachePath(zip,'assessments')), loadCsvCache(zipCachePath(zip,'permits'))
+  ]);
+  const cadBy = {};
+  cadRows.forEach(r=>{ cadBy[Number(r.ParID)] = {APN:r.APN, PropAddr:r.PropAddr, PropZip:r.PropZip,
+    Acres:parseFloat(r.Acres)||0, DeededAcreage:r.DeededAcreage, LUCode:r.LUCode, LUDesc:r.LUDesc, Owner:r.Owner}; });
+  const salesBy = {};
+  deedRows.forEach(r=>{
+    const pid = Number(r.parcelid);
+    (salesBy[pid] ||= []).push({parcelid:pid, name:r.name, SalePrice:parseFloat(r.SalePrice)||0,
+      sortdate:Number(r.sortdate), InstrumentType:r.InstrumentType, OwnDoc:r.OwnDoc, url:r.url});
+  });
+  const assessBy = {};
+  assessRows.forEach(r=>{
+    const pid = Number(r.parcelid);
+    (assessBy[pid] ||= []).push({parcelid:pid, sortdate:Number(r.sortdate),
+      IMP_APPR_VAL:parseFloat(r.IMP_APPR_VAL)||0, LAND_APPR_VAL:parseFloat(r.LAND_APPR_VAL)||0});
+  });
+  const permitByApn = {};
+  permitRows.forEach(r=>{
+    if (!(r.apn in permitByApn)) permitByApn[r.apn] = [];
+    if (r.effDate) permitByApn[r.apn].push(Number(r.effDate));
+  });
+  return {cadBy, salesBy, assessBy, permitByApn};
+}
+async function saveZipCache(zip, {cadBy, salesBy, assessBy, permitByApn}){
+  if (!cacheAvailable) return;
+  const cadRows = Object.entries(cadBy).map(([pid,c])=>({ParID:pid, APN:c.APN, PropAddr:c.PropAddr,
+    PropZip:c.PropZip, Acres:c.Acres, DeededAcreage:c.DeededAcreage, LUCode:c.LUCode, LUDesc:c.LUDesc, Owner:c.Owner}));
+  const deedRows = Object.values(salesBy).flat().map(d=>({parcelid:d.parcelid, name:d.name, SalePrice:d.SalePrice,
+    sortdate:d.sortdate, InstrumentType:d.InstrumentType, OwnDoc:d.OwnDoc, url:d.url}));
+  const assessRows = Object.values(assessBy).flat().map(a=>({parcelid:a.parcelid, sortdate:a.sortdate,
+    IMP_APPR_VAL:a.IMP_APPR_VAL, LAND_APPR_VAL:a.LAND_APPR_VAL}));
+  const permitRows = [];
+  Object.entries(permitByApn).forEach(([apn,dates])=>{
+    if (!dates.length) permitRows.push({apn, effDate:''});
+    else dates.forEach(d=>permitRows.push({apn, effDate:d}));
+  });
+  await Promise.all([
+    saveCsvCache(zipCachePath(zip,'cadastral'), cadRows), saveCsvCache(zipCachePath(zip,'deeds'), deedRows),
+    saveCsvCache(zipCachePath(zip,'assessments'), assessRows), saveCsvCache(zipCachePath(zip,'permits'), permitRows)
+  ]);
+}
+/* classifies EVERY cached sale for a zip (filter-independent — tol is a real
+   classification input, so it's a parameter; since/price/instr/includeUnknown
+   are applied by the caller afterward) */
+function classifyZipSales(soldIds, salesBy, assessBy, permitByApn, cadBy, tol){
+  const comps = [];
+  soldIds.forEach(pid=>{
+    const sales = (salesBy[pid]||[]).slice().sort((a,b)=>a.sortdate-b.sortdate);
+    const ca = cadBy[pid];
+    const apn = (ca && ca.APN && ca.APN.trim()) || null;
+    const permitDates = (apn && permitByApn[apn]) || [];
+    const hasAnyPermitEver = permitDates.length>0;
+    const hist = (assessBy[pid]||[]).slice().sort((a,b)=>a.sortdate-b.sortdate);
+    const currentlyVacant = !!(ca && ca.LUDesc && ca.LUDesc.includes('VACANT'));
+    const geomLatLngs = ca && ca._geometry ? ringsToLatLngs(ca._geometry) : null;
+    const center = geomLatLngs ? centroidOf(geomLatLngs) : null;
+
+    sales.forEach((s,i)=>{
+      const permitBefore = permitDates.filter(d=>d<=s.sortdate);
+      if (permitBefore.length) return; /* veto: post-construction resale, never vacant land */
+
+      const tags = [];
+      const before = hist.filter(h=>h.sortdate<=s.sortdate);
+      const at = before.length ? before[before.length-1] : null;
+      if (at && at.IMP_APPR_VAL<=tol) tags.push('AssessmentConfirmed');
+
+      const nextSaleMs = i<sales.length-1 ? sales[i+1].sortdate : Infinity;
+      if (permitDates.some(d=>d>s.sortdate && d<=nextSaleMs)) tags.push('PermitInferred');
+
+      if (currentlyVacant && !hasAnyPermitEver) tags.push('NeverBuilt');
+
+      const basis = tags.length ? tags.join('+') : 'Unknown';
+      const prev = i>0 ? sales[i-1] : null;
+      comps.push({
+        parcelid: pid, buyer: s.name, salePrice: s.SalePrice, saleDate: msToISO(s.sortdate), _saleMs: s.sortdate,
+        instr: s.InstrumentType, deedUrl: s.url, seller: prev ? prev.name : '',
+        hop: i+1, tradesInWindow: sales.length,
+        holdDays: prev ? Math.round((s.sortdate-prev.sortdate)/8.64e7) : null,
+        hopSpread: prev ? s.SalePrice-prev.SalePrice : null,
+        landAssd: at ? at.LAND_APPR_VAL : null, vacancyBasis: basis,
+        APN: ca && ca.APN, PropAddr: ca && ca.PropAddr, PropZip: ca && ca.PropZip, Acres: ca && ca.Acres,
+        LUDesc: ca && ca.LUDesc, Owner: ca && ca.Owner,
+        perAcre: (ca && ca.Acres>0) ? Math.round(s.SalePrice/ca.Acres) : null,
+        propertyCategory: propertyCategory(ca && ca.APN, ca && ca.LUDesc), buyerIsKnownBuilder: isKnownBuilder(s.name),
+        _latlngs: geomLatLngs, _center: center
+      });
+    });
+  });
+  return comps;
+}
+async function computeVacantCompsForZip(zip, since, tol, signal, prog){
+  const {cadBy, salesBy, assessBy, permitByApn} = await loadZipCache(zip);
+
+  prog(0, `${zip}: finding parcels…`);
+  const candFeats = await pageAll(EP.cad, {where:`PropZip='${zip}'`, outFields:'ParID', orderByFields:'ParID ASC'}, CAD_PAGE, signal);
+  const candidateIds = [...new Set(candFeats.map(f=>f.attributes.ParID))];
+  if (!candidateIds.length) return [];
+
+  prog(0.05, `${zip}: parcel details for ${candidateIds.length.toLocaleString()} parcels…`);
+  await pool(chunk(candidateIds,200), 4, signal, async b=>{
+    const r = await aq(EP.cad, {where:`ParID IN (${b.join(',')})`,
+      outFields:'ParID,APN,PropAddr,PropZip,Acres,DeededAcreage,LUCode,LUDesc,Owner',
+      returnGeometry:'true', outSR:4326}, signal);
+    (r.features||[]).forEach(f=>{ cadBy[f.attributes.ParID] = {...f.attributes, _geometry:f.geometry}; });
+  }, (d,t)=>prog(0.05+0.1*d/t, `${zip}: parcel detail batches ${d}/${t}`));
+
+  /* start at the requested window, only ever move the floor LATER (never
+     earlier) if the cache already covers past it — same caveat as
+     Get-LandComps.ps1 -Persist: a ZIP's earliest coverage is bounded by
+     whichever -since was used the first time it was cached */
+  let fetchSince = since;
+  const cachedSortdates = Object.values(salesBy).flat().map(s=>s.sortdate);
+  if (cachedSortdates.length) {
+    const cachedMaxStr = msToISO(Math.max(...cachedSortdates));
+    if (cachedMaxStr > fetchSince) fetchSince = cachedMaxStr;
+  }
+  prog(0.15, `${zip}: deed history since ${fetchSince}…`);
+  const freshDeeds = [];
+  await pool(chunk(candidateIds,40), 6, signal, async b=>{
+    const feats = await pageAll(EP.deeds, {where:`parcelid IN (${b.join(',')}) AND sortdate >= '${fetchSince}' AND SalePrice > 0 AND InstrumentType IN ('Deed','Trustees Deed')`,
+      outFields:'parcelid,name,SalePrice,sortdate,InstrumentType,OwnDoc,url', orderByFields:'sortdate ASC'}, HIST_PAGE, signal);
+    feats.forEach(f=>freshDeeds.push(f.attributes));
+  }, (d,t)=>prog(0.15+0.2*d/t, `${zip}: deed batches ${d}/${t}`));
+  freshDeeds.forEach(d=>{ (salesBy[d.parcelid] ||= []).push(d); });
+  Object.keys(salesBy).forEach(pid=>{
+    const seen = new Set();
+    salesBy[pid] = salesBy[pid].filter(d=>{
+      const key = `${d.parcelid}|${d.sortdate}|${d.OwnDoc}|${d.SalePrice}`;
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    });
+  });
+
+  const soldIds = Object.keys(salesBy).map(Number).filter(pid=>salesBy[pid].length);
+  if (!soldIds.length) { await saveZipCache(zip, {cadBy, salesBy, assessBy, permitByApn}); return []; }
+
+  prog(0.4, `${zip}: assessment history…`);
+  const needAssess = soldIds.filter(pid=>!(pid in assessBy));
+  if (needAssess.length){
+    await pool(chunk(needAssess,20), 6, signal, async b=>{
+      const feats = await pageAll(EP.assess, {where:`parcelid IN (${b.join(',')})`,
+        outFields:'parcelid,sortdate,IMP_APPR_VAL,LAND_APPR_VAL', orderByFields:'sortdate ASC'}, HIST_PAGE, signal);
+      feats.forEach(f=>{ (assessBy[f.attributes.parcelid] ||= []).push(f.attributes); });
+    }, (d,t)=>prog(0.4+0.15*d/t, `${zip}: assessment batches ${d}/${t}`));
+    needAssess.forEach(pid=>{ if (!(pid in assessBy)) assessBy[pid] = []; });
+  }
+
+  prog(0.55, `${zip}: permit history…`);
+  const apnsForSold = [...new Set(soldIds.map(pid=>cadBy[pid]?.APN?.trim()).filter(Boolean))];
+  const needPermits = apnsForSold.filter(apn=>!(apn in permitByApn));
+  if (needPermits.length){
+    const subTypeList = NEW_CONSTRUCTION_SUB_TYPES.map(s=>`'${s}'`).join(',');
+    await pool(chunk(needPermits,40), 6, signal, async b=>{
+      const apnList = b.map(a=>`'${a.replace(/'/g,"''")}'`).join(',');
+      const feats = await pageAll(EP.permit, {where:`APN IN (${apnList}) AND CASE_TYPE IN ('CARN','CACN') AND SUB_TYPE IN (${subTypeList})`,
+        outFields:'APN,SUB_TYPE,DATE_ISSUED,DATE_ACCEPTED', orderByFields:'DATE_ISSUED ASC'}, HIST_PAGE, signal);
+      feats.forEach(f=>{
+        const apn = (f.attributes.APN||'').trim(); if (!apn) return;
+        const eff = f.attributes.DATE_ISSUED || f.attributes.DATE_ACCEPTED; if (!eff) return;
+        (permitByApn[apn] ||= []).push(eff);
+      });
+    }, (d,t)=>prog(0.55+0.2*d/t, `${zip}: permit batches ${d}/${t}`));
+    needPermits.forEach(apn=>{ if (!(apn in permitByApn)) permitByApn[apn] = []; });
+  }
+
+  prog(0.8, `${zip}: saving cache…`);
+  await saveZipCache(zip, {cadBy, salesBy, assessBy, permitByApn});
+
+  prog(0.9, `${zip}: classifying…`);
+  return classifyZipSales(soldIds, salesBy, assessBy, permitByApn, cadBy, tol);
+}
+async function computeVacantComps(zips, opts, signal, onProgress){
+  const since = opts.since, floor = opts.priceFloor ?? 1000, ceil = opts.priceCeil ?? 0,
+        tol = opts.improvementTolerance ?? 0, includeUnknown = !!opts.includeUnknown;
+  const instrOk = opts.includeTrustee ? (i=>i==='Deed'||i==='Trustees Deed') : (i=>i==='Deed');
+  const prog = (frac, label) => onProgress && onProgress(frac, label);
+
+  let all = [];
+  for (let zi=0; zi<zips.length; zi++){
+    const zip = zips[zi];
+    const zipProg = (frac, label) => prog((zi+frac)/zips.length, label);
+    const zipComps = await computeVacantCompsForZip(zip, since, tol, signal, zipProg);
+    all = all.concat(zipComps);
+  }
+
+  /* since/price/instrument/includeUnknown are output filters — never affect what's cached */
+  return all.filter(c => c._saleMs >= Date.parse(since) && c.salePrice > floor && (ceil<=0 || c.salePrice<=ceil) &&
+    instrOk(c.instr) && (includeUnknown || c.vacancyBasis !== 'Unknown'));
+}
+
 /* ══════════════ TAB 3 · LAND COMPS ══════════════
-   Postman-validated recipe (api/NASHVILLE_PARCELS_API.md):
-   1. assessments where IMP_APPR_VAL=0  → candidate parcels
-   2. market deeds for candidates       → sales
-   3. full assessment history for sold  → vacant-at-sale classification
-   4. cadastral join                    → address / acres / LU / geometry
-   Chains: seller of hop N = buyer of hop N-1.                      */
+   Thin wrapper around computeVacantComps() — see that function for the
+   three-signal vacant-at-purchase classification logic. */
+buildZipGrid('cp', false);
 const COMP_COLS = [
   {k:'PropAddr',t:'Address'},{k:'PropZip',t:'ZIP'},{k:'Acres',t:'Acres',f:'n'},
   {k:'salePrice',t:'Sale',f:'$'},{k:'perAcre',t:'$/acre',f:'$'},{k:'saleDate',t:'Date'},
-  {k:'buyer',t:'Buyer'},{k:'seller',t:'Seller'},{k:'hop',t:'Hop',f:'n',d:0},
-  {k:'holdDays',t:'Held (d)',f:'n',d:0},{k:'hopSpread',t:'Hop spread',f:'$',pos:true},
+  {k:'buyer',t:'Buyer'},{k:'buyerIsKnownBuilder',t:'Builder?'},{k:'seller',t:'Seller'},
+  {k:'instr',t:'Instrument'},{k:'vacancyBasis',t:'Vacancy basis'},{k:'propertyCategory',t:'Category'},
+  {k:'hop',t:'Hop',f:'n',d:0},{k:'holdDays',t:'Held (d)',f:'n',d:0},{k:'hopSpread',t:'Hop spread',f:'$',pos:true},
   {k:'LUDesc',t:'Use now'},{k:'landAssd',t:'Land appr @ sale',f:'$'},{k:'APN',t:'APN'}
 ];
+async function saveCompsResultsCache(rows){
+  if (!cacheAvailable || !rows.length) return;
+  const cols = COMP_COLS.map(c=>c.k);
+  const byZip = {};
+  rows.forEach(r=>{ const z = r.PropZip||'unknown'; (byZip[z] ||= []).push(r); });
+  await Promise.all(Object.entries(byZip).map(([zip, zrows]) =>
+    saveCsvCache(zipCachePath(zip,'comps-results'), projectRows(zrows, cols))
+  ));
+}
 $('run-comps').onclick = async ()=>{
   const signal = startRun(); if (!signal) return;
   try{
-    const salesStart = isoNYearsAgo(num('cp-years'));
-    const assessStart = isoNMonthsBefore(salesStart, num('cp-lead'));
-    const floor=num('cp-floor'), ceil=num('cp-ceil'), tol=num('cp-tol');
-    const instr = $('cp-trustee').checked ? "InstrumentType IN ('Deed','Trustees Deed')" : "InstrumentType = 'Deed'";
-
-    /* step 1 — candidate parcels: any zero-improvement assessment in window */
-    setProg(0,4,'1/4 · Finding zero-improvement assessments…');
-    const zeroRows = (await pageAll(EP.assess,
-      {where:`IMP_APPR_VAL = 0 AND sortdate >= '${assessStart}'`, outFields:'parcelid',
-       orderByFields:'parcelid ASC'}, HIST_PAGE, signal,
-      n=>setProg(Math.min(.95, n/40000),4,`1/4 · ${n.toLocaleString()} assessment rows…`)
-    )).map(f=>f.attributes.parcelid);
-    const candidates = [...new Set(zeroRows.filter(v=>v!=null))];
-    if (!candidates.length) throw new Error('No zero-improvement assessments found in that window.');
-
-    /* step 2 — market deeds for candidates */
-    let where2 = `sortdate >= '${salesStart}' AND SalePrice > ${floor} AND ${instr}`;
-    if (ceil>0) where2 += ` AND SalePrice <= ${ceil}`;
-    const dBatches = chunk(candidates, 40);
-    setProg(1,4,`2/4 · Deeds for ${candidates.length.toLocaleString()} candidate parcels…`);
-    const deedFeats = await pool(dBatches, 5, signal, b =>
-      pageAll(EP.deeds, {where:`parcelid IN (${b.join(',')}) AND ${where2}`,
-        outFields:'parcelid,name,SalePrice,sortdate,InstrumentType,OwnDoc,url',
-        orderByFields:'sortdate ASC'}, HIST_PAGE, signal),
-      (d,t)=>setProg(1+d/t,4,`2/4 · Deed batches ${d}/${t}`));
-    const salesBy = {};
-    deedFeats.flat().forEach(f=>{ (salesBy[f.attributes.parcelid] ||= []).push(f.attributes); });
-    const soldIds = Object.keys(salesBy).map(Number);
-    if (!soldIds.length) throw new Error('Candidates found, but none sold in the window with those filters.');
-
-    /* step 3 — full assessment history for sold parcels → classify each sale */
-    const aBatches = chunk(soldIds, 20);
-    setProg(2,4,`3/4 · Assessment history for ${soldIds.length.toLocaleString()} sold parcels…`);
-    const assessFeats = await pool(aBatches, 5, signal, b =>
-      pageAll(EP.assess, {where:`parcelid IN (${b.join(',')})`,
-        outFields:'parcelid,sortdate,IMP_APPR_VAL,LAND_APPR_VAL', orderByFields:'sortdate ASC'},
-        HIST_PAGE, signal),
-      (d,t)=>setProg(2+d/t,4,`3/4 · Assessment batches ${d}/${t}`));
-    const assessBy = {};
-    assessFeats.flat().forEach(f=>{ (assessBy[f.attributes.parcelid] ||= []).push(f.attributes); });
-
-    let comps=[], skippedBuilt=0, skippedUnknown=0;
-    soldIds.forEach(pid=>{
-      const sales = salesBy[pid].sort((a,b)=>a.sortdate-b.sortdate);
-      const hist  = (assessBy[pid]||[]).sort((a,b)=>a.sortdate-b.sortdate);
-      sales.forEach((s,i)=>{
-        const before = hist.filter(h=>h.sortdate<=s.sortdate);
-        const at = before[before.length-1];
-        if (!at){ skippedUnknown++; return; }
-        if (at.IMP_APPR_VAL > tol){ skippedBuilt++; return; }
-        const prev = i>0 ? sales[i-1] : null;
-        comps.push({parcelid:pid, buyer:s.name, salePrice:s.SalePrice, saleDate:msToISO(s.sortdate),
-          _saleMs:s.sortdate, instr:s.InstrumentType, deedUrl:s.url,
-          seller: prev ? prev.name : '', hop:i+1, tradesInWindow:sales.length,
-          holdDays: prev ? Math.round((s.sortdate-prev.sortdate)/8.64e7) : null,
-          hopSpread: prev ? s.SalePrice - prev.SalePrice : null,
-          landAssd: at.LAND_APPR_VAL});
-      });
-    });
+    const zips = [...document.querySelectorAll('#cp-zips input:checked')].map(cb=>cb.value);
+    if (!zips.length) throw new Error('Pick at least one ZIP.');
+    const opts = {
+      since: isoNYearsAgo(num('cp-years')), priceFloor: num('cp-floor'), priceCeil: num('cp-ceil'),
+      improvementTolerance: num('cp-tol'), includeTrustee: $('cp-trustee').checked, includeUnknown: $('cp-unknown').checked
+    };
+    let comps = await computeVacantComps(zips, opts, signal, (frac,label)=>setProg(frac,1,label));
+    if (!comps.length) throw new Error('No vacant-at-purchase comps found — widen the ZIPs, years, or price band.');
     if ($('cp-chains').checked) comps = comps.filter(c=>c.tradesInWindow>=2);
-    if (!comps.length) throw new Error(`No vacant-at-sale comps survived (skipped ${skippedBuilt} improved-at-sale, ${skippedUnknown} unclassifiable).`);
-
-    /* step 4 — cadastral join */
-    const cIds = [...new Set(comps.map(c=>c.parcelid))];
-    setProg(3,4,`4/4 · Cadastral join for ${cIds.length.toLocaleString()} parcels…`);
-    const cadFeats = await pool(chunk(cIds,200), 4, signal, b =>
-      aq(EP.cad, {where:`ParID IN (${b.join(',')})`,
-        outFields:'ParID,APN,PropAddr,PropZip,Acres,DeededAcreage,LUCode,LUDesc,Owner',
-        returnGeometry:'true', outSR:4326}, signal).then(j=>j.features||[]),
-      (d,t)=>setProg(3+d/t,4,`4/4 · Cadastral batches ${d}/${t}`));
-    const cadBy={};
-    cadFeats.flat().forEach(f=>{ cadBy[f.attributes.ParID]=f; });
-    comps.forEach(c=>{
-      const cf = cadBy[c.parcelid];
-      if (cf){ Object.assign(c, cf.attributes);
-        c._latlngs = ringsToLatLngs(cf.geometry); c._center = centroidOf(c._latlngs); }
-      c.perAcre = (c.Acres>0) ? Math.round(c.salePrice/c.Acres) : null;
-    });
+    if (!comps.length) throw new Error('Comps found, but none traded 2+ times — uncheck "Resold-parcel chains only".');
 
     setResults(COMP_COLS, comps, 'vacant-land sales');
     drawResults(comps, r => `<div class="pp"><h3>${escHtml(r.PropAddr||'(no address)')}</h3>
       <div class="apn">APN ${escHtml(r.APN||'')} · hop ${r.hop} of ${r.tradesInWindow}</div><dl>
       <dt>Sale</dt><dd>${fmt$(r.salePrice)} · ${r.saleDate}</dd>
       <dt>$/acre</dt><dd>${fmt$(r.perAcre)} (${fmtN(r.Acres)} ac)</dd>
-      <dt>Buyer</dt><dd>${escHtml(r.buyer)}</dd>
+      <dt>Buyer</dt><dd>${escHtml(r.buyer)}${r.buyerIsKnownBuilder?' (known builder)':''}</dd>
       <dt>Seller</dt><dd>${escHtml(r.seller||'— (pre-window)')}</dd>
       ${r.holdDays!=null?`<dt>Prev hold</dt><dd>${r.holdDays}d · ${r.hopSpread>=0?'+':''}${fmt$(r.hopSpread)}</dd>`:''}
       <dt>Land appr @ sale</dt><dd>${fmt$(r.landAssd)}</dd>
+      <dt>Vacancy basis</dt><dd>${escHtml(r.vacancyBasis)}</dd>
       <dt>Use now</dt><dd>${escHtml(r.LUDesc||'—')}</dd></dl>
       ${r.deedUrl?`<a href="${escHtml(r.deedUrl)}" target="_blank" rel="noopener">Deed record ↗</a>`:''}
       <button class="zbtn">Zoning + flood check</button><div class="zres"></div></div>`,
@@ -778,10 +1265,14 @@ $('run-comps').onclick = async ()=>{
       .sort((a,b)=>b.med-a.med).slice(0,6)
       .map(o=>`  ${o.z}  <b>${fmt$(o.med)}</b>/ac  (${o.n})`).join('\n');
     const resold = new Set(comps.filter(c=>c.tradesInWindow>=2).map(c=>c.parcelid)).size;
-    showSummary(`<b>${comps.length.toLocaleString()}</b> vacant-at-sale comps · <b>${resold}</b> parcels resold in window\n`+
+    const byBasis = {};
+    comps.forEach(c=>{ byBasis[c.vacancyBasis]=(byBasis[c.vacancyBasis]||0)+1; });
+    const basisLine = Object.entries(byBasis).map(([k,v])=>`${k}=${v}`).join(', ');
+    showSummary(`<b>${comps.length.toLocaleString()}</b> vacant-at-purchase comps · <b>${resold}</b> parcels resold in window\n`+
       `median <b>${fmt$(median(comps.map(c=>c.salePrice)))}</b> · median <b>${fmt$(median(withAcre.map(c=>c.perAcre)))}</b>/ac\n`+
-      `skipped: ${skippedBuilt.toLocaleString()} improved-at-sale · ${skippedUnknown.toLocaleString()} no assessment before sale\n`+
+      `basis: ${basisLine}\n`+
       (zipLines?`top ZIPs by $/ac (n≥5):\n${zipLines}`:''));
+    await saveCompsResultsCache(comps);  /* data/<zip>/comps-results.csv — overwritten each run */
     endRun();
   }catch(e){ fail(e); }
 };
@@ -795,6 +1286,8 @@ let activeTab='leads';
       $('tab-'+x).classList.toggle('on', x===t);
       $('panel-'+x).classList.toggle('on', x===t);
     });
+    if (t==='leads') { if (!map.hasLayer(zipLayer)) zipLayer.addTo(map); }
+    else { map.removeLayer(zipLayer); }
   };
 });
 </script>
