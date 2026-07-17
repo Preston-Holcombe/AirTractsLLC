@@ -1,0 +1,6 @@
+# Local persistence cache written by server.js / Get-LandComps.ps1 -Persist —
+# regenerable from Metro Nashville's live ArcGIS endpoints, not source of truth
+data/
+
+# Script/CLI output CSVs
+*.csv

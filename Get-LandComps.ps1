@@ -48,8 +48,15 @@
     data/<zip>/deeds.csv        accumulated raw deed history (append-only cache)
     data/<zip>/assessments.csv  accumulated raw assessment history
     data/<zip>/permits.csv      accumulated raw new-construction permit history
+    data/<zip>/demolitions.csv  accumulated raw demolition permit history (veto
+                                 signal — a demo permit issued after a sale means
+                                 the buyer inherited and tore down a structure
+                                 themselves, so that sale wasn't vacant land)
     data/<zip>/master.csv       full classified comp set as of the last run —
                                  used to compute what's "new" this run
+  A manual false-positive list also lives at data/excluded-apns.csv (one APN per
+  line, shared with air_tracts_live.html's "Excluded parcels" field) — any comp
+  whose APN appears there is dropped from OUTPUT on every run, persist or not.
   Deeds are cached broadly (SalePrice > 0, InstrumentType Deed/Trustees Deed only,
   no price band) and re-classified from the full cache every run, so changing
   -PriceFloor, -PriceCeil, -ChainsOnly, or -IncludeUnknown between runs never
@@ -288,11 +295,16 @@ function Export-DeedsCache {
   $Rows | Select-Object parcelid, name, SalePrice, sortdate, InstrumentType, OwnDoc, url | Export-Csv -Path $Path -NoTypeInformation
 }
 function Import-AssessCache {
+  # one row per parcel ever checked; sortdate is empty for parcels checked and
+  # found to have NO assessment record — a meaningful cached result, not
+  # "unchecked" (same convention as Import-PermitCache below)
   param([string]$Path)
   if (-not (Test-Path $Path)) { return @() }
   return @(Import-Csv -Path $Path | ForEach-Object {
-    [pscustomobject]@{ parcelid = [long]$_.parcelid; sortdate = [long]$_.sortdate;
-      IMP_APPR_VAL = [double]$_.IMP_APPR_VAL; LAND_APPR_VAL = [double]$_.LAND_APPR_VAL }
+    [pscustomobject]@{ parcelid = [long]$_.parcelid;
+      sortdate = if ($_.sortdate) { [long]$_.sortdate } else { $null };
+      IMP_APPR_VAL = if ($_.sortdate) { [double]$_.IMP_APPR_VAL } else { $null };
+      LAND_APPR_VAL = if ($_.sortdate) { [double]$_.LAND_APPR_VAL } else { $null } }
   })
 }
 function Export-AssessCache {
@@ -340,6 +352,16 @@ if ($Persist -and (-not $Zips -or $ParIds -or $Apns)) {
   throw '-Persist requires -Zips and is not compatible with -ParIds/-Apns (no per-ZIP cache partition for those).'
 }
 
+# manual false-positive exclusion list — shared with air_tracts_live.html's
+# "Excluded parcels" field via the same data/excluded-apns.csv file, for cases
+# the classifier can't fully prove from county digital records alone
+$excludedApnsDir = if ($DataDir) { $DataDir } else { Join-Path $PSScriptRoot 'data' }
+$excludedApnsPath = Join-Path $excludedApnsDir 'excluded-apns.csv'
+$excludedApns = @{}
+if (Test-Path $excludedApnsPath) {
+  Import-Csv -Path $excludedApnsPath | ForEach-Object { if ($_.apn) { $excludedApns[$_.apn.Trim()] = $true } }
+}
+
 $salesStart = if ($PSBoundParameters.ContainsKey('Years')) { (Get-Date).AddYears(-$Years).ToString('yyyy-MM-dd') } else { $Since }
 $outputInstrTypes = if ($IncludeTrustee) { @('Deed', 'Trustees Deed') } else { @('Deed') }
 
@@ -348,7 +370,7 @@ $outputInstrTypes = if ($IncludeTrustee) { @('Deed', 'Trustees Deed') } else { @
 #    by Since/PriceFloor/PriceCeil/IncludeTrustee/ChainsOnly/IncludeUnknown —
 #    those are applied afterward, by the caller, to whatever this returns) ──
 function Get-ClassifiedComps {
-  param($SoldIds, [hashtable]$SalesBy, [hashtable]$AssessBy, [hashtable]$PermitByApn, [hashtable]$CadBy, [double]$ImprovementTolerance)
+  param($SoldIds, [hashtable]$SalesBy, [hashtable]$AssessBy, [hashtable]$PermitByApn, [hashtable]$DemoByApn, [hashtable]$CadBy, [double]$ImprovementTolerance)
   $comps = New-Object System.Collections.Generic.List[object]
   foreach ($parcelId in $SoldIds) {
     $sales = @($SalesBy[$parcelId] | Sort-Object sortdate)
@@ -357,6 +379,7 @@ function Get-ClassifiedComps {
     $cf = $CadBy[$parcelId]
     $apn = if ($cf -and $cf.APN) { $cf.APN.Trim() } else { $null }
     $permitDates = if ($apn -and $PermitByApn.ContainsKey($apn)) { $PermitByApn[$apn] } else { @() }
+    $demoDates = if ($apn -and $DemoByApn -and $DemoByApn.ContainsKey($apn)) { $DemoByApn[$apn] } else { @() }
     $hasAnyNewConstructionPermitEver = ($permitDates.Count -gt 0)
     $currentlyVacant = ($cf -and $cf.LUDesc -and $cf.LUDesc -like '*VACANT*')
 
@@ -370,13 +393,20 @@ function Get-ClassifiedComps {
       $permitBefore = $permitDates | Where-Object { $_ -le $s.sortdate }
       if (@($permitBefore).Count -gt 0) { continue }
 
+      $nextSaleMs = if ($i -lt $sales.Count - 1) { $sales[$i + 1].sortdate } else { [long]::MaxValue }
+
+      # veto: a demolition permit was pulled AFTER this sale (before the next one),
+      # meaning the buyer inherited a standing structure and tore it down themselves —
+      # it wasn't vacant land when they bought it, even if it looks vacant now.
+      $demoAfter = $demoDates | Where-Object { $_ -gt $s.sortdate -and $_ -le $nextSaleMs }
+      if (@($demoAfter).Count -gt 0) { continue }
+
       $tags = New-Object System.Collections.Generic.List[string]
 
       $before = @($hist | Where-Object { $_.sortdate -le $s.sortdate })
       $at = if ($before.Count -gt 0) { $before[-1] } else { $null }
       if ($at -and $at.IMP_APPR_VAL -le $ImprovementTolerance) { $tags.Add('AssessmentConfirmed') }
 
-      $nextSaleMs = if ($i -lt $sales.Count - 1) { $sales[$i + 1].sortdate } else { [long]::MaxValue }
       $permitAfter = $permitDates | Where-Object { $_ -gt $s.sortdate -and $_ -le $nextSaleMs }
       if (@($permitAfter).Count -gt 0) { $tags.Add('PermitInferred') }
 
@@ -443,11 +473,12 @@ function ConvertTo-FinalRow {
 # apply the run's requested output filters (Since/PriceFloor/PriceCeil/IncludeTrustee/
 # ChainsOnly/IncludeUnknown) to a fully-classified row set — never affects what's cached
 function Select-OutputRows {
-  param($Rows, [string]$SalesStart, [double]$PriceFloor, [double]$PriceCeil, [string[]]$OutputInstrTypes, [bool]$ChainsOnly, [bool]$IncludeUnknown)
+  param($Rows, [string]$SalesStart, [double]$PriceFloor, [double]$PriceCeil, [string[]]$OutputInstrTypes, [bool]$ChainsOnly, [bool]$IncludeUnknown, [hashtable]$ExcludedApns)
   $sinceMs = ConvertTo-EpochMs $SalesStart
   $out = $Rows | Where-Object {
     $_.SaleDateMs -ge $sinceMs -and $_.Sale -gt $PriceFloor -and ($PriceCeil -le 0 -or $_.Sale -le $PriceCeil) -and
-    ($_.InstrumentType -in $OutputInstrTypes) -and ($IncludeUnknown -or $_.VacancyBasis -ne 'Unknown')
+    ($_.InstrumentType -in $OutputInstrTypes) -and ($IncludeUnknown -or $_.VacancyBasis -ne 'Unknown') -and
+    (-not $ExcludedApns -or -not $_.APN -or -not $ExcludedApns.ContainsKey($_.APN.Trim()))
   }
   if ($ChainsOnly) { $out = $out | Where-Object { $_.TradesInWindow -ge 2 } }
   return @($out)
@@ -464,6 +495,7 @@ if ($Persist) {
     $deedsPath = Join-Path $zipDir 'deeds.csv'
     $assessPath = Join-Path $zipDir 'assessments.csv'
     $permitPath = Join-Path $zipDir 'permits.csv'
+    $demoPath = Join-Path $zipDir 'demolitions.csv'
     $cadPath = Join-Path $zipDir 'cadastral.csv'
     $masterPath = Join-Path $zipDir 'master.csv'
 
@@ -522,7 +554,10 @@ if ($Persist) {
     foreach ($a in $cachedAssess) {
       $cachedAssessIds[$a.parcelid] = $true
       if (-not $assessBy.ContainsKey($a.parcelid)) { $assessBy[$a.parcelid] = New-Object System.Collections.Generic.List[object] }
-      $assessBy[$a.parcelid].Add($a)
+      # a null sortdate is a "checked, nothing on file" marker row — register
+      # the parcel as checked (above) without adding a phantom zero-value
+      # record, which would otherwise falsely satisfy AssessmentConfirmed
+      if ($null -ne $a.sortdate) { $assessBy[$a.parcelid].Add($a) }
     }
     $needAssess = if ($RefreshAssessments) { $soldIds } else { @($soldIds | Where-Object { -not $cachedAssessIds.ContainsKey($_) }) }
     if ($needAssess.Count -gt 0) {
@@ -537,7 +572,13 @@ if ($Persist) {
             IMP_APPR_VAL = [double]$f.attributes.IMP_APPR_VAL; LAND_APPR_VAL = [double]$f.attributes.LAND_APPR_VAL })
         }
       }
-      Export-AssessCache -Path $assessPath -Rows ($assessBy.Values | ForEach-Object { $_ })
+      # ensure every requested-but-record-less parcel is still recorded as "checked" so it isn't re-queried forever
+      foreach ($parcelId in $needAssess) { if (-not $assessBy.ContainsKey($parcelId)) { $assessBy[$parcelId] = New-Object System.Collections.Generic.List[object] } }
+      $assessRows = foreach ($parcelId in $assessBy.Keys) {
+        if ($assessBy[$parcelId].Count -eq 0) { [pscustomobject]@{ parcelid = $parcelId; sortdate = $null; IMP_APPR_VAL = $null; LAND_APPR_VAL = $null } }
+        else { foreach ($a in $assessBy[$parcelId]) { $a } }
+      }
+      Export-AssessCache -Path $assessPath -Rows $assessRows
     } else { Write-Host "  assessment history already fully cached" }
 
     # permits: only fetch for APNs not already cached
@@ -576,8 +617,43 @@ if ($Persist) {
       Export-PermitCache -Path $permitPath -Rows $permitRows
     } else { Write-Host "  permit history already fully cached" }
 
+    # demolitions: same fetch/cache shape as permits, but CASE_TYPE = 'CADM' with
+    # no SUB_TYPE filter — used only to veto a sale as vacant-at-purchase, never
+    # to confirm it, so any demolition record counts regardless of sub-type
+    $demoByApn = @{}
+    $cachedDemos = Import-PermitCache -Path $demoPath
+    $cachedDemoApns = @{}
+    foreach ($p in $cachedDemos) {
+      $cachedDemoApns[$p.apn] = $true
+      if (-not $demoByApn.ContainsKey($p.apn)) { $demoByApn[$p.apn] = New-Object System.Collections.Generic.List[long] }
+      if ($null -ne $p.effDate) { $demoByApn[$p.apn].Add($p.effDate) }
+    }
+    $needDemo = if ($RefreshPermits) { $apnsForSold } else { @($apnsForSold | Where-Object { -not $cachedDemoApns.ContainsKey($_) }) }
+    if ($needDemo.Count -gt 0) {
+      Write-Host "  pulling demolition permit history for $($needDemo.Count) APN(s)..."
+      if ($RefreshPermits) { $demoByApn = @{} }
+      foreach ($b in (Split-IntoChunks -Items $needDemo -Size 40)) {
+        $apnList = ($b | ForEach-Object { "'$($_ -replace "'", "''")'" }) -join ','
+        $where = "APN IN ($apnList) AND CASE_TYPE = 'CADM'"
+        $feats = Get-ArcAllPages -Url $EP.Permit -QueryParams @{ where = $where; outFields = 'APN,DATE_ISSUED,DATE_ACCEPTED'; orderByFields = 'DATE_ISSUED ASC' } -PageSize $HIST_PAGE
+        foreach ($f in $feats) {
+          $apn = [string]$f.attributes.APN; if (-not $apn) { continue }; $apn = $apn.Trim()
+          $eff = if ($f.attributes.DATE_ISSUED) { $f.attributes.DATE_ISSUED } else { $f.attributes.DATE_ACCEPTED }
+          if (-not $eff) { continue }
+          if (-not $demoByApn.ContainsKey($apn)) { $demoByApn[$apn] = New-Object System.Collections.Generic.List[long] }
+          $demoByApn[$apn].Add([long]$eff)
+        }
+      }
+      foreach ($apn in $needDemo) { if (-not $demoByApn.ContainsKey($apn)) { $demoByApn[$apn] = New-Object System.Collections.Generic.List[long] } }
+      $demoRows = foreach ($apn in $demoByApn.Keys) {
+        if ($demoByApn[$apn].Count -eq 0) { [pscustomobject]@{ apn = $apn; effDate = $null } }
+        else { foreach ($d in $demoByApn[$apn]) { [pscustomobject]@{ apn = $apn; effDate = $d } } }
+      }
+      Export-PermitCache -Path $demoPath -Rows $demoRows
+    } else { Write-Host "  demolition permit history already fully cached" }
+
     Write-Host "  classifying $($soldIds.Count) sold parcel(s)..."
-    $classified = Get-ClassifiedComps -SoldIds $soldIds -SalesBy $salesBy -AssessBy $assessBy -PermitByApn $permitByApn -CadBy $cadBy -ImprovementTolerance $ImprovementTolerance
+    $classified = Get-ClassifiedComps -SoldIds $soldIds -SalesBy $salesBy -AssessBy $assessBy -PermitByApn $permitByApn -DemoByApn $demoByApn -CadBy $cadBy -ImprovementTolerance $ImprovementTolerance
     $zipFinal = @($classified | ForEach-Object { ConvertTo-FinalRow -Comp $_ -CadBy $cadBy })
 
     $oldKeys = Import-MasterKeys -Path $masterPath
@@ -589,7 +665,7 @@ if ($Persist) {
   }
 
   $filtered = Select-OutputRows -Rows $allNewRows -SalesStart $salesStart -PriceFloor $PriceFloor -PriceCeil $PriceCeil `
-    -OutputInstrTypes $outputInstrTypes -ChainsOnly $ChainsOnly.IsPresent -IncludeUnknown $IncludeUnknown.IsPresent
+    -OutputInstrTypes $outputInstrTypes -ChainsOnly $ChainsOnly.IsPresent -IncludeUnknown $IncludeUnknown.IsPresent -ExcludedApns $excludedApns
   $filtered = $filtered | Sort-Object Date -Descending
   if ($MaxResults -gt 0) { $filtered = $filtered | Select-Object -First $MaxResults }
   $filtered | Select-Object Address,ZIP,Acres,Sale,PerAcre,Date,Buyer,BuyerIsKnownBuilder,Seller,InstrumentType,VacancyBasis,PropertyCategory,Hop,TradesInWindow,HeldDays,HopSpread,UseNow,LandApprAtSale,APN,ParcelId,DeedUrl |
@@ -607,14 +683,14 @@ $candidates = New-Object System.Collections.Generic.List[long]
 if ($ParIds) { $ParIds | ForEach-Object { $candidates.Add($_) } }
 
 if ($Apns) {
-  Write-Host "1/6 - resolving $($Apns.Count) APN(s) to ParID..."
+  Write-Host "1/7 - resolving $($Apns.Count) APN(s) to ParID..."
   $apnList = ($Apns | ForEach-Object { "'$($_ -replace "'", "''")'" }) -join ','
   $feats = Get-ArcAllPages -Url $EP.Cad -QueryParams @{ where = "APN IN ($apnList)"; outFields = 'ParID'; orderByFields = 'ParID ASC' } -PageSize $CAD_PAGE
   $feats | ForEach-Object { $candidates.Add([long]$_.attributes.ParID) }
 }
 
 if ($Zips) {
-  Write-Host "1/6 - finding parcels in ZIP(s) $($Zips -join ', ')..."
+  Write-Host "1/7 - finding parcels in ZIP(s) $($Zips -join ', ')..."
   $zipList = ($Zips | ForEach-Object { "'$_'" }) -join ','
   $feats = Get-ArcAllPages -Url $EP.Cad -QueryParams @{ where = "PropZip IN ($zipList)"; outFields = 'ParID'; orderByFields = 'ParID ASC' } -PageSize $CAD_PAGE
   $feats | ForEach-Object { $candidates.Add([long]$_.attributes.ParID) }
@@ -634,7 +710,7 @@ if ($candidateIds.Count -eq 0) { throw 'No candidate parcels found - widen the f
 Write-Host "    $($candidateIds.Count) candidate parcel(s)"
 
 # ── step 2: market deeds for candidates ────────────────────────────────────
-Write-Host "2/6 - pulling deed history (purchases since $salesStart)..."
+Write-Host "2/7 - pulling deed history (purchases since $salesStart)..."
 $where2 = "sortdate >= '$salesStart' AND SalePrice > $PriceFloor AND $(if ($IncludeTrustee) { "InstrumentType IN ('Deed','Trustees Deed')" } else { "InstrumentType = 'Deed'" })"
 if ($PriceCeil -gt 0) { $where2 += " AND SalePrice <= $PriceCeil" }
 
@@ -653,7 +729,7 @@ if ($soldIds.Count -eq 0) { throw 'Candidates found, but none sold in the window
 Write-Host "    $($soldIds.Count) parcel(s) sold in window"
 
 # ── step 3: cadastral details for sold parcels (need APN + current LUDesc early) ──
-Write-Host "3/6 - joining current parcel details..."
+Write-Host "3/7 - joining current parcel details..."
 $cadBy = @{}
 foreach ($b in (Split-IntoChunks -Items $soldIds -Size 200)) {
   $resp = Invoke-ArcQuery -Url $EP.Cad -QueryParams @{ where = "ParID IN ($($b -join ','))"; outFields = 'ParID,APN,PropAddr,PropZip,Acres,DeededAcreage,LUCode,LUDesc,Owner'; returnGeometry = 'false' }
@@ -661,7 +737,7 @@ foreach ($b in (Split-IntoChunks -Items $soldIds -Size 200)) {
 }
 
 # ── step 4a: assessment history for sold parcels (AssessmentConfirmed signal) ──
-Write-Host "4/6 - pulling assessment history..."
+Write-Host "4/7 - pulling assessment history..."
 $assessBy = @{}
 foreach ($b in (Split-IntoChunks -Items $soldIds -Size 20)) {
   $feats = Get-ArcAllPages -Url $EP.Assess -QueryParams @{ where = "parcelid IN ($($b -join ','))"; outFields = 'parcelid,sortdate,IMP_APPR_VAL,LAND_APPR_VAL'; orderByFields = 'sortdate ASC' } -PageSize $HIST_PAGE
@@ -673,7 +749,7 @@ foreach ($b in (Split-IntoChunks -Items $soldIds -Size 20)) {
 }
 
 # ── step 4b: new-construction permit history, joined by APN (PermitInferred + NeverBuilt signals) ──
-Write-Host "5/6 - pulling new-construction permit history..."
+Write-Host "5/7 - pulling new-construction permit history..."
 $apnsForSold = @($soldIds | ForEach-Object { $cf = $cadBy[$_]; if ($cf -and $cf.APN) { $cf.APN.Trim() } } | Where-Object { $_ } | Select-Object -Unique)
 $permitByApn = @{}
 $subTypeList = ($NEW_CONSTRUCTION_SUB_TYPES | ForEach-Object { "'$_'" }) -join ','
@@ -694,12 +770,33 @@ if ($apnsForSold.Count -gt 0) {
   }
 }
 
+# ── step 4c: demolition permit history, joined by APN (veto signal — a demo permit
+#    issued after a sale means the buyer inherited and tore down a structure themselves) ──
+Write-Host "6/7 - pulling demolition permit history..."
+$demoByApn = @{}
+if ($apnsForSold.Count -gt 0) {
+  foreach ($b in (Split-IntoChunks -Items $apnsForSold -Size 40)) {
+    $apnList = ($b | ForEach-Object { "'$($_ -replace "'", "''")'" }) -join ','
+    $where = "APN IN ($apnList) AND CASE_TYPE = 'CADM'"
+    $feats = Get-ArcAllPages -Url $EP.Permit -QueryParams @{ where = $where; outFields = 'APN,DATE_ISSUED,DATE_ACCEPTED'; orderByFields = 'DATE_ISSUED ASC' } -PageSize $HIST_PAGE
+    foreach ($f in $feats) {
+      $apn = [string]$f.attributes.APN
+      if (-not $apn) { continue }
+      $apn = $apn.Trim()
+      $effDate = if ($f.attributes.DATE_ISSUED) { $f.attributes.DATE_ISSUED } else { $f.attributes.DATE_ACCEPTED }
+      if (-not $effDate) { continue }
+      if (-not $demoByApn.ContainsKey($apn)) { $demoByApn[$apn] = New-Object System.Collections.Generic.List[long] }
+      $demoByApn[$apn].Add([long]$effDate)
+    }
+  }
+}
+
 # ── step 5: classify + project + filter ─────────────────────────────────────
-Write-Host "6/6 - classifying sales..."
-$classified = Get-ClassifiedComps -SoldIds $soldIds -SalesBy $salesBy -AssessBy $assessBy -PermitByApn $permitByApn -CadBy $cadBy -ImprovementTolerance $ImprovementTolerance
+Write-Host "7/7 - classifying sales..."
+$classified = Get-ClassifiedComps -SoldIds $soldIds -SalesBy $salesBy -AssessBy $assessBy -PermitByApn $permitByApn -DemoByApn $demoByApn -CadBy $cadBy -ImprovementTolerance $ImprovementTolerance
 $final = @($classified | ForEach-Object { ConvertTo-FinalRow -Comp $_ -CadBy $cadBy })
 $final = Select-OutputRows -Rows $final -SalesStart $salesStart -PriceFloor $PriceFloor -PriceCeil $PriceCeil `
-  -OutputInstrTypes $outputInstrTypes -ChainsOnly $ChainsOnly.IsPresent -IncludeUnknown $IncludeUnknown.IsPresent
+  -OutputInstrTypes $outputInstrTypes -ChainsOnly $ChainsOnly.IsPresent -IncludeUnknown $IncludeUnknown.IsPresent -ExcludedApns $excludedApns
 if (-not $final -or ($final | Measure-Object).Count -eq 0) {
   throw 'No vacant-at-purchase comps survived. Widen -Since, add -IncludeUnknown, or check the ZIP/price filters.'
 }
