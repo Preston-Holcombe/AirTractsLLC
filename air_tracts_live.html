@@ -264,8 +264,20 @@ const EP = {
   permit: 'https://maps.nashville.gov/arcgis2/rest/services/Parcels/ParcelHistory/MapServer/4/query',
   zips:   'https://maps.nashville.gov/arcgis/rest/services/Boundaries/Boundaries/MapServer/0/query',
   zoning: 'https://maps.nashville.gov/arcgis/rest/services/Zoning_Landuse/Zoning/MapServer/14/query',
-  flood:  'https://maps.nashville.gov/arcgis/rest/services/Zoning_Landuse/Zoning/MapServer/19/query'
+  flood:  'https://maps.nashville.gov/arcgis/rest/services/Zoning_Landuse/Zoning/MapServer/19/query',
+  /* Nashville's own GIS has no wetlands layer — this is the federal National
+     Wetlands Inventory (US Fish & Wildlife Service), publicly queryable, no
+     token needed. Note: geometry must be a plain "x,y" string here, not the
+     {x,y,spatialReference} object shape most other Esri services accept —
+     this service 400s on the object form. */
+  wetlands: 'https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/0/query'
 };
+/* the official public NWI viewer — doesn't support any form of URL deep
+   linking to a coordinate (confirmed: panning/searching never changes the
+   URL), so this can only ever open to the national extent, not the parcel.
+   Included as a secondary reference link; the live check + on-map polygon
+   below are what actually answer "is this parcel wetland." */
+const WETLANDS_MAPPER_URL = 'https://fwsprimary.wim.usgs.gov/wetlands/apps/wetlands-mapper/';
 const HIST_PAGE = 100;   /* arcgis2 hard cap */
 const CAD_PAGE  = 1000;
 
@@ -523,7 +535,8 @@ function drawResults(rows, popupFn, colorFn){
   if (bounds.length && !$('ld-live').checked) map.fitBounds(bounds,{padding:[24,24],maxZoom:16});
 }
 
-/* lazy zoning + flood on popup click (point-in-polygon, layer 14 / 19) */
+/* lazy zoning + flood + wetlands on popup click (point-in-polygon /
+   point-intersects, Nashville layers 14/19 + federal NWI wetlands layer) */
 function wireZoning(row, lyr){
   const el = lyr.getPopup().getElement(); if (!el) return;
   const btn = el.querySelector('.zbtn'); if (!btn) return;
@@ -533,18 +546,40 @@ function wireZoning(row, lyr){
       const g = JSON.stringify({x:row._center[1], y:row._center[0]});
       const base = {geometry:g, geometryType:'esriGeometryPoint', inSR:4326,
         spatialRel:'esriSpatialRelIntersects', returnGeometry:'false'};
-      const [z,f] = await Promise.all([
+      const [z,f,w] = await Promise.all([
         aq(EP.zoning, {...base, outFields:'ZONE_DESC,ZONE_TYPE,NAME'}),
-        aq(EP.flood,  {...base, outFields:'FloodZone,SFHA_TF'})
+        aq(EP.flood,  {...base, outFields:'FloodZone,SFHA_TF'}),
+        /* NWI 400s on the {x,y,spatialReference} shape the two calls above use — needs
+           plain "lng,lat" instead. It ALSO 400s on any specific outFields list here,
+           because it's a joined layer (Wetlands + NWI_Wetland_Codes both define
+           ATTRIBUTE) and the ambiguous field name breaks the query — outFields=*
+           is the only reliable option, and the returned keys come back
+           table-qualified ("Wetlands.WETLAND_TYPE", not "WETLAND_TYPE"). */
+        aq(EP.wetlands, {geometry:`${row._center[1]},${row._center[0]}`, geometryType:'esriGeometryPoint', inSR:4326,
+          spatialRel:'esriSpatialRelIntersects', outFields:'*', returnGeometry:'true', outSR:4326})
       ]);
       const za = (z.features[0]||{}).attributes||{};
       const fa = (f.features[0]||{}).attributes||{};
+      const wFeat = (w.features||[])[0];
+      const wa = (wFeat||{}).attributes||{};
+      const wType = wa['Wetlands.WETLAND_TYPE'] ?? wa.WETLAND_TYPE;
+      const wAttr = wa['Wetlands.ATTRIBUTE'] ?? wa.ATTRIBUTE;
+      const wAcres = wa['Wetlands.ACRES'] ?? wa.ACRES;
       const flood = fa.FloodZone ? `${fa.FloodZone}${fa.SFHA_TF==='T'||fa.SFHA_TF==='Y'?' — SFHA!':''}` : 'none mapped';
+      const wetland = wFeat ? `${wType||wAttr||'mapped'}${wAcres?' ('+fmtN(wAcres)+' ac)':''}` : 'none mapped';
       row._zoning = za.ZONE_DESC||'—';
       const res = el.querySelector('.zres');
-      res.textContent = `Zoning ${za.ZONE_DESC||'—'}${za.ZONE_TYPE?' ('+za.ZONE_TYPE+')':''} · Flood: ${flood}`;
+      res.textContent = `Zoning ${za.ZONE_DESC||'—'}${za.ZONE_TYPE?' ('+za.ZONE_TYPE+')':''} · Flood: ${flood} · Wetlands: ${wetland}`;
+      /* draw the actual wetland boundary on the map when this parcel intersects one —
+         more useful than a link, since a link to the federal viewer can't be
+         deep-linked to a coordinate at all (confirmed: its URL never changes) */
+      if (wFeat && wFeat.geometry && wFeat.geometry.rings){
+        const ll = ringsToLatLngs(wFeat.geometry);
+        if (ll) L.polygon(ll, {color:'#2e6ea8', weight:1.6, fillColor:'#2e6ea8', fillOpacity:.25})
+          .bindTooltip(wType||'Wetland (NWI)').addTo(resultLayer);
+      }
       btn.remove();
-    }catch(e){ btn.disabled=false; btn.textContent='Zoning + flood check'; console.error(e); }
+    }catch(e){ btn.disabled=false; btn.textContent='Zoning, flood & wetlands check'; console.error(e); }
   };
 }
 
@@ -595,6 +630,10 @@ function renderTable(){
         h+=`<td>${v?`<a href="${escHtml(v)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${c.label||'Open ↗'}</a>`:''}</td>`;
         return;
       }
+      if (c.editable){
+        h+=`<td><input type="text" class="notecell" data-k="${c.k}" value="${escHtml(v||'')}" placeholder="—" onclick="event.stopPropagation()"></td>`;
+        return;
+      }
       if (c.f==='$') v = fmt$(v);
       else if (c.f==='n') v = fmtN(v, c.d??2);
       else if (c.f==='d') v = v||'';
@@ -628,6 +667,14 @@ function renderTable(){
       if (row && row._layer){ map.setView(row._center,17); row._layer.openPopup(); }
       $('tbl').querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel')); tr.classList.add('sel');
     };
+  });
+  $('tbl').querySelectorAll('.notecell').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const i = +e.target.closest('tr').dataset.i;
+      tblRows[i][e.target.dataset.k] = e.target.value;
+      scheduleNotesSave();
+    });
+    inp.addEventListener('blur', ()=>{ clearTimeout(notesSaveTimer); saveLeadsCache(tblRows); });
   });
 }
 $('csv').onclick = ()=>{
@@ -770,7 +817,8 @@ const LEAD_COLS = [
   {k:'LandAppr',t:'Land appr',f:'$'},{k:'TotlAppr',t:'Total appr',f:'$'},
   {k:'APN',t:'APN'},
   {k:'parcelViewerUrl',t:'Parcel',f:'link',label:'Viewer ↗'},
-  {k:'streetViewUrl',t:'Street View',f:'link',label:'View ↗'}
+  {k:'streetViewUrl',t:'Street View',f:'link',label:'View ↗'},
+  {k:'notes',t:'Notes',editable:true}
 ];
 function shapeLead(f, zip){
   const a=f.attributes;
@@ -798,8 +846,9 @@ const leadPopup = r => `<div class="pp"><h3>${escHtml(r.PropAddr||'(no address)'
   <dt>Use</dt><dd>${escHtml(r.LUDesc)}</dd>
   <dt>Land / total appr</dt><dd>${fmt$(r.LandAppr)} / ${fmt$(r.TotlAppr)}</dd></dl>
   <a href="${escHtml(r.parcelViewerUrl)}" target="_blank" rel="noopener">Parcel viewer ↗</a> ·
-  <a href="${escHtml(r.streetViewUrl)}" target="_blank" rel="noopener">Street View ↗</a>
-  <button class="zbtn">Zoning + flood check</button><div class="zres"></div></div>`;
+  <a href="${escHtml(r.streetViewUrl)}" target="_blank" rel="noopener">Street View ↗</a> ·
+  <a href="${WETLANDS_MAPPER_URL}" target="_blank" rel="noopener">Wetlands Map ↗</a>
+  <button class="zbtn">Zoning, flood &amp; wetlands check</button><div class="zres"></div></div>`;
 
 $('run-leads').onclick = async ()=>{
   const signal = startRun(); if (!signal) return;
@@ -810,11 +859,16 @@ $('run-leads').onclick = async ()=>{
     for (const z of zips){
       zi++;
       setProg(zi-1, zips.length, `ZIP ${z} — ${zi}/${zips.length} · ${rows.length.toLocaleString()} lots so far`);
+      const notesByApn = await loadLeadsNotesForZip(z);
       const feats = await pageAll(EP.cad,
         {where:[`PropZip='${z}'`,...core].join(' AND '), outFields:LEAD_FIELDS,
          returnGeometry:'true', outSR:4326, orderByFields:'OBJECTID ASC'},
         CAD_PAGE, signal);
-      feats.forEach(f=>rows.push(shapeLead(f,z)));
+      feats.forEach(f=>{
+        const lead = shapeLead(f,z);
+        lead.notes = notesByApn[lead.APN] || '';
+        rows.push(lead);
+      });
     }
     await finishLeads(rows, `${zips.length} ZIPs swept`, signal);
   }catch(e){ fail(e); }
@@ -833,6 +887,24 @@ async function saveLeadsCache(rows){
   await Promise.all(Object.entries(byZip).map(([zip, zrows]) =>
     saveCsvCache(zipCachePath(zip,'leads'), projectRows(zrows, cols))
   ));
+}
+/* Notes are free text typed into the results table — auto-saved (debounced,
+   plus an immediate flush on blur) to the same per-ZIP leads.csv cache so
+   they survive a page reload without needing an explicit save action. */
+let notesSaveTimer = null;
+function scheduleNotesSave(){
+  clearTimeout(notesSaveTimer);
+  notesSaveTimer = setTimeout(()=>saveLeadsCache(tblRows), 800);
+}
+/* carries notes forward across re-sweeps of the same ZIP — a fresh sweep
+   rebuilds every other field live, but a lead's notes shouldn't vanish just
+   because you swept its ZIP again. Keyed by APN, not ParID — ParID isn't
+   one of the columns leads.csv actually persists. */
+async function loadLeadsNotesForZip(zip){
+  const rows = await loadCsvCache(zipCachePath(zip,'leads'));
+  const notesByApn = {};
+  rows.forEach(r=>{ if (r.notes && r.APN) notesByApn[r.APN] = r.notes; });
+  return notesByApn;
 }
 
 async function finishLeads(rows, how, signal){
@@ -993,7 +1065,7 @@ $('run-flips').onclick = async ()=>{
       <dt>Spread</dt><dd>${fmt$(r.spread)} in ${r.buildDays}d</dd>
       <dt>End buyer</dt><dd>${escHtml(r.resaleBuyer)}</dd></dl>
       ${r.deedUrl?`<a href="${escHtml(r.deedUrl)}" target="_blank" rel="noopener">Deed record ↗</a>`:''}
-      <button class="zbtn">Zoning + flood check</button><div class="zres"></div></div>`,
+      <button class="zbtn">Zoning, flood &amp; wetlands check</button><div class="zres"></div></div>`,
       r => r.spread>150000 ? '#2e6e4e' : '#c2481e');
     const medLand = median(flips.map(f=>f.landPrice)), medSp = median(flips.map(f=>f.spread));
     showSummary(`<b>${flips.length}</b> confirmed flips\nmedian land <b>${fmt$(medLand)}</b> · median spread <b>${fmt$(medSp)}</b>\nmedian land price = your wholesale ceiling`);
@@ -1375,7 +1447,7 @@ $('run-comps').onclick = async ()=>{
       <dt>Vacancy basis</dt><dd>${escHtml(r.vacancyBasis)}</dd>
       <dt>Use now</dt><dd>${escHtml(r.LUDesc||'—')}</dd></dl>
       ${r.deedUrl?`<a href="${escHtml(r.deedUrl)}" target="_blank" rel="noopener">Deed record ↗</a>`:''}
-      <button class="zbtn">Zoning + flood check</button><div class="zres"></div></div>`,
+      <button class="zbtn">Zoning, flood &amp; wetlands check</button><div class="zres"></div></div>`,
       r => r.tradesInWindow>=2 ? '#2e6e4e' : '#c2481e');
 
     /* summary: county medians + top ZIPs by $/acre */
